@@ -180,9 +180,9 @@ extern/GLM/glm/clean: extern/GLM/glm/CMakeFiles/glm.dir/clean
 # Target rules for target CMakeFiles/ccraft.dir
 
 # All Build rule for target.
+CMakeFiles/ccraft.dir/all: extern/GLFW/src/CMakeFiles/glfw.dir/all
 CMakeFiles/ccraft.dir/all: extern/GLAD/CMakeFiles/glad.dir/all
 CMakeFiles/ccraft.dir/all: extern/GLM/glm/CMakeFiles/glm.dir/all
-CMakeFiles/ccraft.dir/all: extern/GLFW/src/CMakeFiles/glfw.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\ccraft.dir\build.make CMakeFiles/ccraft.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\ccraft.dir\build.make CMakeFiles/ccraft.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="C:\Users\alecu\Programing Projects\ccraftv2\out\build\first\CMakeFiles" --progress-num=1,2,3,4,5,6,7 "Built target ccraft"
