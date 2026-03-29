@@ -47,7 +47,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 }
 
 void CursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
-    state.mouse.position = {xpos,ypos};
+    state.mouse.position = {(float)xpos,(float)ypos};
 }
 
 void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
@@ -127,7 +127,7 @@ float GetDeltaTime() {
 }
 
 vec2 GetWindowDimensions() {
-    return {state.width,state.height};
+    return {(float)state.width,(float)state.height};
 }
 
 int GetWindowHeight() {
@@ -139,7 +139,7 @@ int GetWindowWidth() {
 }
 
 float GetWindowAspect() {
-    return (float)state.height / (float)state.width;
+    return (float)state.width / (float)state.height;
 }
 
 bool IsKeyDown(KeyboardKey key) {

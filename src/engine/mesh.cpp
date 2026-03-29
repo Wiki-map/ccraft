@@ -40,7 +40,7 @@ void Mesh::UpdeteMesh() {
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex)*triangle_count*3,vertices);
 }
 
-void Mesh::PushTriangle(
+void Mesh::PushTriangleGLM(
     glm::vec3 p1,glm::vec3 p2,glm::vec3 p3,
     glm::vec2 uv1,glm::vec2 uv2,glm::vec2 uv3,
     Texture tex
@@ -85,6 +85,20 @@ void Mesh::PushTriangle(
     vertices[triangle_count*3 + 2].tex_index = texpos;
 
     triangle_count++;
+}
+
+void Mesh::PushTriangle(
+    vec3 p1,vec3 p2,vec3 p3,
+    vec2 uv1,vec2 uv2,vec2 uv3,
+    Texture tex
+) {
+ 
+    this->PushTriangleGLM(
+        Vec3ToGLM(p1),Vec3ToGLM(p2),Vec3ToGLM(p3),
+        Vec2ToGLM(uv1),Vec2ToGLM(uv2),Vec2ToGLM(uv3),
+        tex
+    );
+    
 }
 
 void Mesh::Draw() {

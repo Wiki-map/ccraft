@@ -9,6 +9,10 @@ struct Color {
 };
 
 void UseShader(Shader shader);
-void DrawMesh(const Mesh &m);
 
 void ClearBackground(Color c);
+
+#define BLACK {0,0,0,255}
+#define WHITE {255,255,255,255}
+#define CLEAR {0,0,0,0}
+#define SKY_BLUE {130,200,229,255}

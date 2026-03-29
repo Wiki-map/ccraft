@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "glad/gl.h"
+#include <glm/gtc/type_ptr.hpp>
 
 static std::string GetFileContend(std::string path) {
     std::ifstream file(path);
@@ -86,7 +87,24 @@ void Shader::SetVector4Uniform(std::string name,glm::vec4 val) {
 
 void Shader::SetMatrix4Uniform(std::string name,glm::mat4 val) {
     int32_t location = glGetUniformLocation(this->id,name.c_str());
-    glUniformMatrix4fv(location,1,GL_FALSE,&val[0][0]);
+    
+    /*
+    
+        wierd bug with glm, i think the matrix was inverted maybe..
+        idk
+
+        if i pass glm::value_ptr(val) i dosent work...
+
+    */
+
+    float rez[16];
+    for (int i=0; i<4; i++) {
+        for (int j=0; j<4; j++) {
+            rez[i*4+j] = val[j][i];
+        }
+    }
+
+    glUniformMatrix4fv(location,1,GL_FALSE,rez);
 }
 
 void Shader::SetIntArrayUniform(std::string name,int32_t* val,size_t count) {

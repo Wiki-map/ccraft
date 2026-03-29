@@ -4,7 +4,9 @@
 #include <array>
 
 #include "glm/glm.hpp"
+
 #include "engine/texture.h"
+#include "utils.h"
 
 struct Vertex {
     glm::vec3 pos;
@@ -20,9 +22,15 @@ struct Mesh {
     void UpdeteMesh();
     void Clear();
 
-    void PushTriangle(
+    void PushTriangleGLM(
         glm::vec3 p1,glm::vec3 p2,glm::vec3 p3,
         glm::vec2 uv1,glm::vec2 uv2,glm::vec2 uv3,
+        Texture tex
+    );
+
+    void PushTriangle(
+        vec3 p1,vec3 p2,vec3 p3,
+        vec2 uv1,vec2 uv2,vec2 uv3,
         Texture tex
     );
 

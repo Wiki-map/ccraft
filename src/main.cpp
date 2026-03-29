@@ -1,6 +1,9 @@
 #include <iostream>
 #include "engine/window.h"
 #include "engine/renderer.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "camera.h"
+#include "player.h"
 
 int main(){
     InitWindow(800,800,"gl");
@@ -11,29 +14,87 @@ int main(){
     int32_t u_tex[8] = {0,1,2,3,4,5,6,7};
     s.SetIntArrayUniform("u_tex",u_tex,8);
 
-    vec3 p1 = {0.5,0.5,0.5};
-    vec3 p2 = {-0.5,0.5,0.5};
-    vec3 p3 = {-0.5,-0.5,0.5};
-    vec3 p4 = {0.5,-0.5,0.5};
+    float pos[] = {
+        -0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
 
-    vec2 uv1 = {0,0};
-    vec2 uv2 = {1,0};
-    vec2 uv3 = {0,1};
-    vec2 uv4 = {1,1};
+        -0.5f, -0.5f,  0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
+
+        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f,  0.5f, 
+        -0.5f,  0.5f,  0.5f,
+
+         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+
+        -0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f, -0.5f,
+
+        -0.5f,  0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f,
+         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f, -0.5f
+    };
+
+    vec2 uv1 = {0,1};
+    vec2 uv2 = {1,1};
+    vec2 uv3 = {0,0};
+    vec2 uv4 = {1,0};
 
     Mesh mesh = Mesh(512);
 
     mesh.Clear();
-    mesh.PushTriangle(
-        p1,p2,p3,uv1,uv3,uv2,tex
-    );
-    mesh.PushTriangle(
-        p1,p3,p4,uv1,uv3,uv4,tex
-    );
+    
+    for (int i=0; i<6; i++) {
+        vec3 p1 = {pos[i*6*3],pos[i*6*3+1],pos[i*6*3+2]};
+        vec3 p2 = {pos[(i*6+1)*3],pos[(i*6+1)*3+1],pos[(i*6+1)*3+2]};
+        vec3 p3 = {pos[(i*6+2)*3],pos[(i*6+2)*3+1],pos[(i*6+2)*3+2]};
+
+        mesh.PushTriangle(p1,p2,p3,uv1,uv2,uv3,tex);
+
+        vec3 p4 = {pos[(i*6+3)*3],pos[(i*6+3)*3+1],pos[(i*6+3)*3+2]};
+        vec3 p5 = {pos[(i*6+4)*3],pos[(i*6+4)*3+1],pos[(i*6+4)*3+2]};
+        vec3 p6 = {pos[(i*6+5)*3],pos[(i*6+5)*3+1],pos[(i*6+5)*3+2]};
+
+        mesh.PushTriangle(p4,p5,p6,uv3,uv4,uv1,tex);
+    }
+
     mesh.UpdeteMesh();
 
+    Player player = Player({0,0,0});
+
     while (!IsWindowClosed()) {
-        ClearBackground({255,255,255,255});
+        ClearBackground(SKY_BLUE);
+
+        if (IsKeyDown(KeyboardKey::KEY_ESCAPE)) {
+            break;
+        }
+
+        player.Update();
+
+        UseCamera(s,player.GetCamera());
 
         UseShader(s);
         mesh.Draw();
