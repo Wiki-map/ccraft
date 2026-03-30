@@ -5,7 +5,7 @@
 
 struct Camera {
     vec3 position;
-    vec3 direction;
+    vec3 target;
     float fov,near,far;
 };
 

@@ -102,6 +102,10 @@ void InitWindow(int32_t width,int32_t height,std::string title) {
 
 }
 
+void CenterMouse() {
+    glfwSetCursorPos(state.window,(double)state.width/2,(double)state.height/2);
+}
+
 bool IsWindowClosed() {
     SwapKeyBoardStates();
     SwapMouseButtonStates();
