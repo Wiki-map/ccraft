@@ -4,3 +4,4 @@ CMakePresets.json
 /.idea
 /build
 CMakeKits.json
+.clangd
