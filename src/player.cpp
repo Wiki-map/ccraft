@@ -18,7 +18,7 @@ static int sigen(float val) {
     return val / std::abs(val);
 }
 
-void Player::Update() {
+void Player::Update(float dt) {
 
     if (IsKeyDown(KeyboardKey::C)) {
         CenterMouse();
@@ -46,7 +46,10 @@ void Player::Update() {
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 
-    float speed = 0.05;
+    float speed = 10;
+    if (IsKeyDown(KeyboardKey::LEFT_CONTROL)) speed += 5;
+    if (IsKeyDown(KeyboardKey::RIGHT_SHIFT)) speed -= 5;
+    speed *= dt;
 
     if (IsKeyDown(KeyboardKey::W)) {
         position.x += cos(glm::radians(yaw)) * speed * 1.3;
@@ -82,6 +85,8 @@ void Player::Update() {
         position.y += right.y * speed;
         position.z += right.z * speed;
     }
+
+    //std::cout<<position.x<<" "<<position.y<<" "<<position.z<<"\n";
 }
 
 Camera Player::GetCamera() {
@@ -89,5 +94,5 @@ Camera Player::GetCamera() {
     target.x += direction.x;
     target.y += direction.y;
     target.z += direction.z;
-    return {position,target,60,0.1,100};
+    return {position,target,60,0.1,1000};
 }

@@ -7,6 +7,7 @@
 struct Shader {
     Shader() = default;
     Shader(std::string vertex_path,std::string fragment_path);
+    Shader(std::string vertex_path,std::string fragment_path,size_t texture_count);
 
     void SetVector2Uniform(std::string name,glm::vec2 val);
     void SetVector3Uniform(std::string name,glm::vec3 val);

@@ -1,8 +1,6 @@
 #pragma once
 
-#include "engine/texture.h"
 #include "engine/shader.h"
-#include "engine/mesh.h"
 
 struct Color {
     uint8_t r,g,b,a;

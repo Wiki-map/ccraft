@@ -3,15 +3,15 @@
 #include <cstdint>
 #include <array>
 
-#include "glm/glm.hpp"
-
 #include "engine/texture.h"
 #include "utils.h"
 
 struct Vertex {
-    glm::vec3 pos;
-    glm::vec2 uv;
-    float tex_index;
+    vec3 pos;
+    vec2 uv;
+    int32_t tex_index;
+    vec3 norm;
+    float tint;
 };
 
 struct Mesh {
@@ -22,22 +22,17 @@ struct Mesh {
     void UpdeteMesh();
     void Clear();
 
-    void PushTriangleGLM(
-        glm::vec3 p1,glm::vec3 p2,glm::vec3 p3,
-        glm::vec2 uv1,glm::vec2 uv2,glm::vec2 uv3,
-        Texture tex
-    );
-
+    // NOTE: tint is a float from 0 to 1 specifing the darkness, used for cpu AO
     void PushTriangle(
         vec3 p1,vec3 p2,vec3 p3,
         vec2 uv1,vec2 uv2,vec2 uv3,
-        Texture tex
+        Texture tex,
+        vec3 norm,float tint
     );
 
     void Draw();
 
-    // TODO: check how to delete a buffer
-    ~Mesh();
+    void Clean();
 
 private:
 

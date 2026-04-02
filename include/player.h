@@ -17,6 +17,6 @@ class Player {
 public:
     Player() = default;
     Player(vec3 pos);
-    void Update();
+    void Update(float dt);
     Camera GetCamera();
 };

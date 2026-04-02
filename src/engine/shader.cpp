@@ -69,23 +69,42 @@ Shader::Shader(std::string vertex_path,std::string fragment_path) {
     glDeleteShader(fragment_shader);
 }
 
+Shader::Shader(std::string vertex_path,std::string fragment_path,size_t texture_count) {
+    // There is probably a better way to do this
+    *this = Shader(vertex_path,fragment_path);
+
+    int32_t *u_tex = new int32_t[texture_count];
+    for (int i=0; i<texture_count; i++) u_tex[i] = i;
+    this->SetIntArrayUniform("u_tex",u_tex,texture_count); 
+    delete[] u_tex;
+}
+
 void Shader::SetVector2Uniform(std::string name,glm::vec2 val) {
+    glUseProgram(this->id);
+
     int32_t location = glGetUniformLocation(this->id,name.c_str());
     glUniform2fv(location,1,&val[0]);
 }
 
 void Shader::SetVector3Uniform(std::string name,glm::vec3 val) {
+    glUseProgram(this->id);
+
     int32_t location = glGetUniformLocation(this->id,name.c_str());
     glUniform3fv(location,1,&val[0]);
 }
 
 void Shader::SetVector4Uniform(std::string name,glm::vec4 val) {
+    glUseProgram(this->id);
+
     int32_t location = glGetUniformLocation(this->id,name.c_str());
     glUniform4fv(location,1,&val[0]);
 }
 
 
 void Shader::SetMatrix4Uniform(std::string name,glm::mat4 val) {
+    glUseProgram(this->id);
+
+
     int32_t location = glGetUniformLocation(this->id,name.c_str());
     
     /*
@@ -108,11 +127,17 @@ void Shader::SetMatrix4Uniform(std::string name,glm::mat4 val) {
 }
 
 void Shader::SetIntArrayUniform(std::string name,int32_t* val,size_t count) {
-    int32_t location = glGetUniformLocation(this->id,name.c_str());
+    glUseProgram(this->id);
+
+
+    uint32_t location = glGetUniformLocation(this->id,name.c_str());
     glUniform1iv(location,count,val);
 }
 
 void Shader::SetFloatArrayUniform(std::string name,float* val,size_t count) {
+    glUseProgram(this->id);
+
+
     int32_t location = glGetUniformLocation(this->id,name.c_str());
     glUniform1fv(location,count,val);
 }
