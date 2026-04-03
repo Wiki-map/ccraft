@@ -15,6 +15,8 @@ float GetWindowAspect();
 
 void CenterMouse();
 
+void ImGuiDrawOpengl();
+
 // i got this from the raylib library because i didn't want to copy the glfw keys
 enum class KeyboardKey {
     // Alphanumeric keys

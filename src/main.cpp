@@ -1,4 +1,5 @@
 #include <iostream>
+#include "imgui.h"
 #include "glad/gl.h"
 #include "engine/window.h"
 #include "engine/color.h"
@@ -8,7 +9,7 @@
 #include "worldgen/extern/FastNoise.h"
 #include <map>
 
-const int32_t map_len = 1280 / CHUNK_SIZE;
+const int32_t map_len = 1024 / CHUNK_SIZE;
 const int32_t chunk_count = map_len*map_len;
 Chunk chunks[chunk_count + 5];
 std::map<std::pair<int,int>,int> midx;
@@ -74,14 +75,10 @@ int main(){
         }
     }
 
-
     Player player = Player({0,0,0});
 
     while (!IsWindowClosed()) {
         ClearBackground(rgba(130,200,229,255));
-
-        std::cout<<"[INFO]: FPS is: "<<1.0f/GetDeltaTime()<<"\n";
-
 
         if (IsKeyDown(KeyboardKey::ESCAPE)) {
             break;
@@ -91,6 +88,13 @@ int main(){
 
         UseCamera(s,player.GetCamera());
 
+        {
+            ImGui::Begin("info");
+            ImGui::Text("fps is: %f",1.0f/GetDeltaTime());
+            ImGui::Text("player position is: {%f,%f,%f}",player.GetPosition().x,player.GetPosition().y,player.GetPosition().z);
+            ImGui::End();
+        }
+
         s.Use();
 
         for (int i=0; i<map_len; i++) {
@@ -98,6 +102,8 @@ int main(){
                 chunks[i*map_len + j].Draw();
             }
         }
+
+        ImGuiDrawOpengl();
     }
 
     for (int i=0; i<map_len; i++) {

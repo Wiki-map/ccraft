@@ -2,6 +2,11 @@
 #include <chrono>
 
 #include "engine/window.h"
+
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+
 #include "glad/gl.h"
 #include "GLFW/glfw3.h"
 
@@ -140,6 +145,21 @@ void InitWindow(int32_t width,int32_t height,std::string title) {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback,NULL);
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io.FontGlobalScale = 1.5;
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplGlfw_InitForOpenGL(state.window, true);
+    ImGui_ImplOpenGL3_Init("#version 460");
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.ScaleAllSizes(1);
 }
 
 void CenterMouse() {
@@ -158,6 +178,10 @@ bool IsWindowClosed() {
         state.time.dt = std::chrono::duration_cast<std::chrono::milliseconds>(T2 - state.time.lastframe).count();
         state.time.lastframe = std::chrono::system_clock::now();
     }
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
 
     return glfwWindowShouldClose(state.window);
 }
@@ -204,4 +228,9 @@ bool IsMouseButtonPresed(MouseButton button) {
 
 vec2 GetMousePosition() {
     return state.mouse.position;
+}
+
+void ImGuiDrawOpengl() {
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
