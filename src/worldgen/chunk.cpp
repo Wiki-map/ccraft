@@ -4,22 +4,26 @@
 
 Chunk::Chunk(vec2 pos) {
     position = pos;
-    chunk_mesh = Mesh(CHUNK_MAX_TRIANGLE);
+    mesh = Mesh(CHUNK_MAX_TRIANGLE);
 }
 
-void Chunk::Generate(FastNoise noise_maker,Texture tex) {
+void Chunk::Generate(std::function<float(float,float)> noise_fun) {
 
-    chunk_mesh.Clear();
+    mesh.Clear();
 
     for (int i=0; i<CHUNK_SIZE; i++) {
         for (int j=0; j<CHUNK_SIZE; j++) {
             vec3 top_pos = {(float)i + position.x, 0, (float)j + position.y};
-            top_pos.y = (int)(noise_maker.GetPerlin(top_pos.x,top_pos.z) * 30);
+            top_pos.y = (int)(noise_fun(top_pos.x,top_pos.z));
 
-            vec2 uv1 = {0,0}; // top_bot_right | 
-            vec2 uv2 = {0,1}; // top_pos |
-            vec2 uv3 = {1,0}; // top_bot_left |
-            vec2 uv4 = {1,1}; // top_top_right |
+            Color color = rgba(0, 237, 135, 255);
+            if (top_pos.y > 8 - rand()%3) color = rgba(184, 184, 184, 255);
+            if (top_pos.y > 20 - rand()%3) color = rgba(240,240,240,255);
+            if (top_pos.y < 0) {
+                top_pos.y = 0;
+                color = rgba(47, 114, 222,255);
+            }
+
 
             vec3 top_top_right = top_pos; top_top_right.x ++;
             vec3 top_bot_left = top_pos; top_bot_left.z --;
@@ -34,69 +38,72 @@ void Chunk::Generate(FastNoise noise_maker,Texture tex) {
 
             //top face
             vec3 normt = {0,1,0};
-            chunk_mesh.PushTriangle(
-                top_pos,top_top_right,top_bot_left,uv2,uv4,uv3,tex,normt,1
+            mesh.PushTriangle(
+                top_pos,top_top_right,top_bot_left,color,normt,1
             );
-            chunk_mesh.PushTriangle(
-                top_bot_left,top_top_right,top_bot_right,uv3,uv4,uv1,tex,normt,1
+            mesh.PushTriangle(
+                top_bot_left,top_top_right,top_bot_right,color,normt,1
             );
 
 
             //bot face
             vec3 normb = {0,-1,0};
-            chunk_mesh.PushTriangle(
-                bot_pos,bot_top_right,bot_bot_left,uv1,uv2,uv3,tex,normb,1
+            mesh.PushTriangle(
+                bot_pos,bot_top_right,bot_bot_left,color,normb,1
             );
-            chunk_mesh.PushTriangle(
-                bot_bot_left,bot_top_right,bot_bot_right,uv1,uv2,uv3,tex,normb,1
+            mesh.PushTriangle(
+                bot_bot_left,bot_top_right,bot_bot_right,color,normb,1
             );
 
 
             //right face
             vec3 normr = {1,0,0};
-            chunk_mesh.PushTriangle(
-                top_top_right,top_bot_right,bot_top_right,uv1,uv2,uv3,tex,normr,1
+            mesh.PushTriangle(
+                top_top_right,top_bot_right,bot_top_right,color,normr,1
             );
-            chunk_mesh.PushTriangle(
-                bot_bot_right,top_bot_right,bot_top_right,uv1,uv2,uv3,tex,normr,1
+            mesh.PushTriangle(
+                bot_bot_right,top_bot_right,bot_top_right,color,normr,1
             );
 
 
             //left face
             vec3 norml = {-1,0,0};
-            chunk_mesh.PushTriangle(
-                top_pos,top_bot_left,bot_pos,uv1,uv2,uv3,tex,norml,1
+            mesh.PushTriangle(
+                top_pos,top_bot_left,bot_pos,color,norml,1
             );
-            chunk_mesh.PushTriangle(
-                bot_bot_left,top_bot_left,bot_pos,uv1,uv2,uv3,tex,norml,1
+            mesh.PushTriangle(
+                bot_bot_left,top_bot_left,bot_pos,color,norml,1
             );
 
 
             //front face
             vec3 normf = {0,0,-1};
-            chunk_mesh.PushTriangle(
-                top_bot_left,top_bot_right,bot_bot_left,uv1,uv2,uv3,tex,normf,1
+            mesh.PushTriangle(
+                top_bot_left,top_bot_right,bot_bot_left,color,normf,1
             );
-            chunk_mesh.PushTriangle(
-                bot_bot_right,top_bot_right,bot_bot_left,uv1,uv2,uv3,tex,normf,1
+            mesh.PushTriangle(
+                bot_bot_right,top_bot_right,bot_bot_left,color,normf,1
             );
+
 
             //back face
             vec3 normbk = {0,0,1};
-            chunk_mesh.PushTriangle(
-                top_pos,top_top_right,bot_pos,uv1,uv2,uv3,tex,normbk,1
+            mesh.PushTriangle(
+                top_pos,top_top_right,bot_pos,color,normbk,1
             );
-            chunk_mesh.PushTriangle(
-                bot_top_right,top_top_right,bot_pos,uv1,uv2,uv3,tex,normbk,1
+            mesh.PushTriangle(
+                bot_top_right,top_top_right,bot_pos,color,normbk,1
             );
-
-
         }
     }
 
-    chunk_mesh.UpdeteMesh();
+    mesh.UpdeteMesh();
 }
 
 void Chunk::Draw() {
-    chunk_mesh.Draw();
+    mesh.Draw();
+}
+
+void Chunk::Clean() {
+    mesh.Clean();
 }

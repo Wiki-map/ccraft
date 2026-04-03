@@ -63,20 +63,11 @@ Shader::Shader(std::string vertex_path,std::string fragment_path) {
         char buffer[512];
         glGetProgramInfoLog(this->id,512,NULL,buffer);
         std::cout<<buffer<<"\n";
+        exit(-1);
     }
 
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
-}
-
-Shader::Shader(std::string vertex_path,std::string fragment_path,size_t texture_count) {
-    // There is probably a better way to do this
-    *this = Shader(vertex_path,fragment_path);
-
-    int32_t *u_tex = new int32_t[texture_count];
-    for (int i=0; i<texture_count; i++) u_tex[i] = i;
-    this->SetIntArrayUniform("u_tex",u_tex,texture_count); 
-    delete[] u_tex;
 }
 
 void Shader::SetVector2Uniform(std::string name,glm::vec2 val) {
@@ -144,4 +135,8 @@ void Shader::SetFloatArrayUniform(std::string name,float* val,size_t count) {
 
 int32_t Shader::GetShaderID() {
     return this->id;
+}
+
+void Shader::Use() {
+    glUseProgram(this->id);
 }

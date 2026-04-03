@@ -2,7 +2,8 @@
 
 #include "utils.h"
 #include "engine/mesh.h"
-#include "worldgen/extern/FastNoise.h"
+#include <functional>
+
 
 #define CHUNK_SIZE 16
 
@@ -11,11 +12,13 @@ struct Chunk {
     Chunk() = default;
     Chunk(vec2 pos);
 
-    void Generate(FastNoise noise_maker,Texture tex);
+    void Generate(std::function<float(float,float)> noise_fun);
 
     void Draw();
 
+    void Clean();
+
 private:
-    Mesh chunk_mesh;
+    Mesh mesh;
     vec2 position;
 };
