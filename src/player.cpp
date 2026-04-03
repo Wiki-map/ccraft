@@ -94,5 +94,15 @@ Camera Player::GetCamera() {
     target.x += direction.x;
     target.y += direction.y;
     target.z += direction.z;
-    return {position,target,60,0.1,1000};
+    return {position,target,60,0.1,10000};
+}
+
+vec3 Player::GetPosition() {
+    return position;
+}
+vec3 Player::GetDirection() {
+    return direction;
+}
+vec3 Player::GetRight() {
+    return vec3Normalize(vec3Cross(direction,up));
 }

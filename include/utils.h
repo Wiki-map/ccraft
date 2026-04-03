@@ -42,6 +42,7 @@ vec2 vec2Normalize(vec2 val);
 vec3 vec3Normalize(vec3 val);
 vec4 vec4Normalize(vec4 val);
 
+float vec3Dot(vec3 x,vec3 y);
 
 vec3 vec3Cross(vec3 v1,vec3 v2);
 

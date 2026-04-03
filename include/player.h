@@ -19,4 +19,8 @@ public:
     Player(vec3 pos);
     void Update(float dt);
     Camera GetCamera();
+
+    vec3 GetPosition();
+    vec3 GetDirection();
+    vec3 GetRight();
 };

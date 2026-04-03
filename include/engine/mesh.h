@@ -4,14 +4,14 @@
 #include "engine/color.h"
 #include "utils.h"
 
-struct Vertex {
-    vec3 pos;
-    vec4 color;
-    vec3 norm;
-    float tint;
-};
-
 struct Mesh {
+
+    struct Vertex {
+        vec3 pos;
+        vec4 color;
+        vec3 norm;
+        float tint;
+    };
 
     Mesh() = default;
     Mesh(int32_t max_size);
