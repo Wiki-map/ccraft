@@ -1,73 +1,88 @@
 #include "utils.h"
+#include <cmath>
 
-inline vec2 operator +(const vec2 &x,const vec2 &y) {
-    return {x.x + y.x, x.y + y.y};
+vec2 vec2::operator+(const vec2 &b) {
+    return {x+b.x,y+b.y};
 }
-
-inline const vec2& operator +=(vec2 &x,const vec2 &y) {
-    x.x += y.x;
-    x.y += y.y;
-    return x;
+vec2 vec2::operator-(const vec2 &b) {
+    return {x-b.x,y-b.y};
 }
-
-inline vec2 operator -(const vec2 &x,const vec2 &y) {
-    return {x.x - y.x, x.y - y.y};
+vec2 vec2::operator *(float r) {
+    return {x/r,y/r};
 }
-
-inline const vec2& operator -=(vec2 &x,const vec2 &y) {
-    x.x -= y.x;
-    x.y -= y.y;
-    return x;
+vec2 vec2::operator /(float r) {
+    return {x/r,y/r};
 }
 
 
-
-inline vec3 operator +(const vec3 &x,const vec3 &y) {
-    return {x.x + y.x, x.y + y.y, x.z + y.z};
+vec2& vec2::operator +=(vec2 r) {
+    x += r.x;
+    y += r.y;
+    return *this;
+}
+vec2& vec2::operator -=(vec2 r) {
+    x -= r.x;
+    y -= r.x;
+    return *this;
+}
+vec2& vec2::operator *=(float r) {
+    x *= r;
+    y *= r;
+    return *this;
+}
+vec2& vec2::operator /=(float r) {
+    x /= r;
+    y /= r;
+    return *this;
 }
 
-inline const vec3& operator +=(vec3 &x,const vec3 &y) {
-    x.x += y.x;
-    x.y += y.y;
-    x.z += y.z;
-    return x;
+std::ostream& operator<<(std::ostream &os,const vec2& val) {
+    os << "["<<val.x<<","<<val.y<<"]";
+    return os;
 }
 
-inline vec3 operator -(const vec3 &x,const vec3 &y) {
-    return {x.x - y.x, x.y - y.y, x.z - y.z};
+vec3 vec3::operator +(const vec3 &b) {
+    return {x + b.x,y + b.y,z + b.z};
+}
+vec3 vec3::operator -(const vec3 &b) {
+    return {x - b.x, y - b.y, z - b.z};
+}
+vec3 vec3::operator *(float r) {
+    return {x * r,y * r,z * r};
+}
+vec3 vec3::operator /(float r) {
+    return {x/r,y/r,z/r};
 }
 
-inline const vec3& operator -=(vec3 &x,const vec3 &y) {
-    x.x -= y.x;
-    x.y -= y.y;
-    x.z -= y.z;
-    return x;
+vec3& vec3::operator +=(vec3 r) {
+    x += r.x;
+    y += r.y;
+    z += r.z;
+    return *this;
+}
+vec3& vec3::operator -=(vec3 r) {
+    x -= r.x;
+    y -= r.y;
+    z -= r.z;
+    return *this;
 }
 
-
-
-inline vec4 operator +(const vec4 &x,const vec4 &y) {
-    return {x.x + y.x, x.y + y.y, x.z + y.z,x.w + y.w};
+vec3& vec3::operator *=(float r) {
+    x *= r;
+    y *= r;
+    z *= r;
+    return *this;
+}
+vec3& vec3::operator /=(float r) {
+    x /= r;
+    y /= r;
+    z /= r;
+    return *this;
 }
 
-inline const vec4& operator +=(vec4 &x,const vec4 &y) {
-    x.x += y.x;
-    x.y += y.y;
-    x.z += y.z;
-    x.w += y.w;
-    return x;
-}
-
-inline vec4 operator -(const vec4 &x,const vec4 &y) {
-    return {x.x - y.x, x.y - y.y, x.z - y.z,x.w - y.w};
-}
-
-inline const vec4 &operator -=(vec4 &x,const vec4 &y) {
-    x.x -= y.x;
-    x.y -= y.y;
-    x.z -= y.z;
-    x.w -= y.w;
-    return x;
+std::ostream& operator<<(std::ostream &os,const vec3& val) {
+    os << '[' << val.x << ','<< val.y << ',' << val.z << ']';
+    return os;
 }
 
 vec2 vec2Normalize(vec2 val) {

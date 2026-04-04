@@ -5,3 +5,5 @@ CMakePresets.json
 /build
 CMakeKits.json
 .clangd
+compile_commands.json
+.DS_Store

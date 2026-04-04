@@ -63,38 +63,26 @@ void Player::Update(float dt) {
     }
 
     if (IsKeyDown(KeyboardKey::SPACE)) {
-        position.x += up.x * speed;
-        position.y += up.y * speed;
-        position.z += up.z * speed;
+        position += up * speed;
     }
     if (IsKeyDown(KeyboardKey::LEFT_SHIFT)) {
-        position.x -= up.x * speed;
-        position.y -= up.y * speed;
-        position.z -= up.z * speed;
+        position -= up * speed;
     }
 
     if (IsKeyDown(KeyboardKey::A)) {
         vec3 right = vec3Normalize(vec3Cross(direction,up));
-        position.x -= right.x * speed;
-        position.y -= right.y * speed;
-        position.z -= right.z * speed;
+        position -= right * speed;
     }
     if (IsKeyDown(KeyboardKey::D)) {
         vec3 right = vec3Normalize(vec3Cross(direction,up));
-        position.x += right.x * speed;
-        position.y += right.y * speed;
-        position.z += right.z * speed;
+        position += right * speed;
     }
 
     //std::cout<<position.x<<" "<<position.y<<" "<<position.z<<"\n";
 }
 
 Camera Player::GetCamera() {
-    vec3 target = position;
-    target.x += direction.x;
-    target.y += direction.y;
-    target.z += direction.z;
-    return {position,target,60,0.1,10000};
+    return {position,position + direction,60,0.1,10000};
 }
 
 vec3 Player::GetPosition() {

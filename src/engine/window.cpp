@@ -116,11 +116,17 @@ void InitWindow(int32_t width,int32_t height,std::string title) {
         exit(-1);
     }
 
+    #ifdef __APPLE__
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    #endif
+
     state.window = glfwCreateWindow(800,800,title.c_str(),NULL,NULL);
     state.width = width;
     state.height = height;
     if (state.window == NULL) {
-        fprintf(stderr,"[ERROR]: No window..");
+        std::cerr<<"[ERROR]: No window..";
         exit(-1);
     }
     glfwMakeContextCurrent(state.window);
@@ -129,10 +135,11 @@ void InitWindow(int32_t width,int32_t height,std::string title) {
 
     int32_t gladrez = gladLoadGL(glfwGetProcAddress);
     if (gladrez == false) {
-        fprintf(stderr,"[ERROR]: Can't load opengl..");
+        std::cerr<<"[ERROR]: Can't load opengl..";
         exit(-1);
     }
     std::cout<<"[INFO]: Loaded opengl, version: "<< GLAD_VERSION_MAJOR(gladrez)<<","<< GLAD_VERSION_MINOR(gladrez)<<"\n";
+
     glEnable(GL_DEPTH_TEST);
 
     glfwSetFramebufferSizeCallback(state.window,WindowUpdateCallback);
@@ -141,9 +148,14 @@ void InitWindow(int32_t width,int32_t height,std::string title) {
     glfwSetCursorPosCallback(state.window,CursorPositionCallback);
     glfwSetMouseButtonCallback(state.window,MouseButtonCallback);
 
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback,NULL);
+    #ifdef ENGINE_DEBUG
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
+        glDebugMessageCallback(MessageCallback,);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    #endif
+
+    std::cout<<"[INFO]: Enabled callbacks\n";
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -156,10 +168,12 @@ void InitWindow(int32_t width,int32_t height,std::string title) {
     ImGui::StyleColorsDark();
 
     ImGui_ImplGlfw_InitForOpenGL(state.window, true);
-    ImGui_ImplOpenGL3_Init("#version 460");
+    ImGui_ImplOpenGL3_Init("#version 410");
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.ScaleAllSizes(1);
+
+    std::cout<<"[INFO]: Enabled ImGui\n";
 }
 
 void CenterMouse() {

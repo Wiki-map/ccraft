@@ -9,7 +9,7 @@
 #include "worldgen/extern/FastNoise.h"
 #include <map>
 
-const int32_t map_len = 1024 / CHUNK_SIZE;
+const int32_t map_len = 640 / CHUNK_SIZE;
 const int32_t chunk_count = map_len*map_len;
 Chunk chunks[chunk_count + 5];
 std::map<std::pair<int,int>,int> midx;
@@ -86,8 +86,6 @@ int main(){
 
         player.Update(GetDeltaTime());
 
-        UseCamera(s,player.GetCamera());
-
         {
             ImGui::Begin("info");
             ImGui::Text("fps is: %f",1.0f/GetDeltaTime());
@@ -95,6 +93,7 @@ int main(){
             ImGui::End();
         }
 
+        UseCamera(s,player.GetCamera());
         s.Use();
 
         for (int i=0; i<map_len; i++) {
