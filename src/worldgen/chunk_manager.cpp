@@ -2,9 +2,13 @@
 #include "worldgen/chunk.h"
 #include "worldgen/extern/FastNoise.h"
 #include <algorithm>
+#include <array>
 #include <cstdlib>
 #include <functional>
+#include <iterator>
+#include <queue>
 #include <utility>
+#include <vector>
 
 ChunkManager::ChunkManager(int render_distance) {
     this->render_distance = render_distance;
@@ -155,31 +159,37 @@ void ChunkManager::Update(vec3 player_pos) {
 }
 
 void ChunkManager::Draw() {
-
-    struct val {
+    struct vec2i {
         int i,j;
     };
 
-    std::vector<val> c;
+    std::queue<vec2i> q;
+    std::vector<std::vector<bool>> mask(render_distance*2+1,std::vector<bool>(render_distance*2+1,false));
 
-    for (int i=0; i<render_distance*2 + 1; i++) {
-        for (int j=0; j<render_distance*2 + 1; j++) {
-            if (!isGenerated[i][j]) continue;
-            c.push_back({i,j});
+    int di[] = {1,-1,0,0};
+    int dj[] = {0,0,1,-1};
+
+    q.push({0,0});
+    q.push({0,render_distance*2});
+    q.push({render_distance*2,0});
+    q.push({render_distance*2,render_distance*2});
+
+    mask[render_distance*2][render_distance*2] = 1;
+    mask[render_distance*2][0] = 1;
+    mask[0][render_distance*2] = 1;
+    mask[0][0] = 1;
+
+    while (!q.empty()) {
+        int ti = q.front().i,tj = q.front().j;
+        if (isGenerated[ti][tj]) chunks[ti][tj].Draw();
+        for (int f=0; f<4; f++) {
+            int i = ti + di[f],j = tj + dj[f];
+            if (i < 0 || j < 0 || i > render_distance*2 || j > render_distance*2) continue;
+            if (mask[i][j]) continue;
+            mask[i][j] = 1;
+            q.push({i,j});
         }
-    }
-
-    std::sort(c.begin(),c.end(),[&](val a,val b) -> bool {
-        float adi = std::abs(a.i - render_distance);
-        float adj = std::abs(a.j - render_distance);
-        float bdi = std::abs(b.i - render_distance);
-        float bdj = std::abs(b.j - render_distance);
-
-        return adi*adi + adj*adj > bdi*bdi + bdj*bdj;
-    });
-
-    for (auto [i,j]: c) {
-        chunks[i][j].Draw();
+        q.pop();
     }
 }
 
