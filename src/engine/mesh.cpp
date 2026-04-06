@@ -85,6 +85,17 @@ void Mesh::PushTriangle(
     triangle_count++;
 }
 
+void Mesh::PushQuad(
+    vec3 top,vec3 right, vec3 left, vec3 bot,
+    Color color,
+    vec3 norm,
+    float tint
+) {
+    PushTriangle(top,right,left,color,norm,tint);
+    PushTriangle(left,right,bot,color,norm,tint);
+}
+
+
 void Mesh::Draw() {
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER,vbo);

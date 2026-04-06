@@ -17,6 +17,9 @@ void CenterMouse();
 
 void ImGuiDrawOpengl();
 
+void DisableCursor();
+void EnableCursor();
+
 // i got this from the raylib library because i didn't want to copy the glfw keys
 enum class KeyboardKey {
     // Alphanumeric keys

@@ -1,33 +1,46 @@
 #pragma once
 
+#include "engine/color.h"
 #include "utils.h"
 #include "engine/mesh.h"
 #include <functional>
-#include <array>
-
 
 #define CHUNK_SIZE 16
+#define CHUNK_HEIGHT 256
+#define BLOCK_SIZE (float)1.0f
+
+enum class BlockType {
+    AIR,
+    DIRT,
+    GRASS,
+    STONE
+};
+
+Color GetBlockColor(BlockType type);
 
 struct Chunk {
 
     Chunk() = default;
     Chunk(vec2 pos);
 
-    void GenerateHeight(std::function<float(float,float)> noise_fun);
-    void GenerateMesh(std::function<int32_t(float,float)> height_sampler);
+    void Init();
+
+    void GenerateVoxels(std::function<float(float,float)> noise_function);
+    void GenerateMesh(std::function<BlockType(vec3)> voxel_sampler);
 
     void Draw();
-
     void Clean();
 
-    int32_t GetHeight(float i,float j);
+    BlockType GetBlock(vec3 pos);
+
+    vec2 GetPosition();
 
 private:
 
-    void SpawnBlock(vec3 pos,std::function<int32_t(float,float)> height_sampler);
+    void PushCube(vec3 top_pos,std::function<BlockType(vec3)> voxel_sampler);
 
     Mesh mesh;
     vec2 position;
 
-    std::array<std::array<int32_t,CHUNK_SIZE>,CHUNK_SIZE> height;
+    std::vector<BlockType> voxels;
 };

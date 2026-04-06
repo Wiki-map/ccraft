@@ -151,8 +151,7 @@ void InitWindow(int32_t width,int32_t height,std::string title) {
     #ifdef ENGINE_DEBUG
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
-        glDebugMessageCallback(MessageCallback,);
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+        glDebugMessageCallback(MessageCallback,nullptr);
     #endif
 
     std::cout<<"[INFO]: Enabled callbacks\n";
@@ -248,3 +247,15 @@ void ImGuiDrawOpengl() {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
+void DisableCursor() {
+    glfwSetInputMode(state.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    CenterMouse();
+    glfwSetInputMode(state.window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+}
+void EnableCursor() {
+    glfwSetInputMode(state.window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    CenterMouse();
+    glfwSetInputMode(state.window, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+}
+

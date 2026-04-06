@@ -27,6 +27,20 @@ struct Mesh {
         float tint
     );
 
+    /*
+     *  top --- right
+     *  |         |
+     *  |         |
+     *  |         |
+     *  left --- bot
+     */
+    void PushQuad(
+        vec3 top,vec3 right, vec3 left, vec3 bot,
+        Color color,
+        vec3 norm,
+        float tint
+    );
+
     void Draw();
 
     void Clean();
