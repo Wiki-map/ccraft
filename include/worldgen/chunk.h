@@ -6,14 +6,16 @@
 #include <functional>
 
 #define CHUNK_SIZE 16
-#define CHUNK_HEIGHT 256
+#define CHUNK_HEIGHT 64
 #define BLOCK_SIZE (float)1.0f
+#define WATTER_LEVEL 25
 
 enum class BlockType {
     AIR,
     DIRT,
     GRASS,
-    STONE
+    STONE,
+    SAND
 };
 
 Color GetBlockColor(BlockType type);
@@ -40,6 +42,7 @@ private:
     void PushCube(vec3 top_pos,std::function<BlockType(vec3)> voxel_sampler);
 
     Mesh mesh;
+    Mesh translucent;
     vec2 position;
 
     std::vector<BlockType> voxels;

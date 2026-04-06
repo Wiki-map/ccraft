@@ -13,6 +13,7 @@ void Chunk::Init() {
     const int max_block_per_position = 256;
     const int triangle_per_cube = 12;
     mesh = Mesh(CHUNK_SIZE * CHUNK_SIZE * max_block_per_position * triangle_per_cube);
+    translucent = Mesh(CHUNK_SIZE * CHUNK_SIZE * triangle_per_cube);
 }
 
 void Chunk::GenerateVoxels(std::function<float(float,float)> noise_function) {
@@ -29,7 +30,8 @@ void Chunk::GenerateVoxels(std::function<float(float,float)> noise_function) {
             for (float z=0; z<CHUNK_SIZE; z++) {
                 int32_t idx = x*CHUNK_SIZE * CHUNK_HEIGHT + y * CHUNK_SIZE + z;
                 if (y > heights[x][z]) voxels[idx] = BlockType::AIR;
-                else if (y == heights[x][z]) voxels[idx] = BlockType::GRASS;
+                else if (y == heights[x][z] && y > WATTER_LEVEL) voxels[idx] = BlockType::GRASS;
+                else if (y == heights[x][z]) voxels[idx] = BlockType::SAND;
                 else if (heights[x][z] - y <= 3) {
                     voxels[idx] = BlockType::DIRT;
                 }
@@ -58,6 +60,7 @@ Color GetBlockColor(BlockType type) {
     if (type == BlockType::DIRT) return rgba(97, 68, 9,255);
     if (type == BlockType::GRASS) return rgba(28, 184, 95,255);
     if (type == BlockType::STONE) return rgba(145, 145, 145,255);
+    if (type == BlockType::SAND) return rgba(247, 204, 84,255);
     return rgba(0,0,0,0);
 }
 
@@ -72,6 +75,16 @@ void Chunk::PushCube(vec3 top_pos,std::function<BlockType(vec3)> voxel_sampler) 
     vec3 bot_bot_right = bot_bot_left; bot_bot_right.x += BLOCK_SIZE;
 
     Color color = GetBlockColor(voxel_sampler(top_pos));
+
+    if (top_pos.y < WATTER_LEVEL*BLOCK_SIZE && voxel_sampler(top_pos + (vec3){0,BLOCK_SIZE,0}) == BlockType::AIR) {
+        vec3 norm = {0,1,0};
+        Color colorw = rgba(44, 110, 232,150);
+        vec3 topw = top_pos; topw.y = WATTER_LEVEL;
+        vec3 top_top_rightw = topw; top_top_rightw.x += BLOCK_SIZE;
+        vec3 top_bot_leftw = topw; top_bot_leftw.z += BLOCK_SIZE;
+        vec3 top_bot_rightw = top_bot_leftw; top_bot_rightw.x += BLOCK_SIZE;
+        translucent.PushQuad(topw,top_top_rightw,top_bot_leftw,top_bot_rightw,colorw,norm, 1);
+    }
 
     if (voxel_sampler(top_pos + (vec3){0,BLOCK_SIZE,0}) == BlockType::AIR) {
         vec3 norm = {0,1,0};
@@ -109,6 +122,7 @@ void Chunk::PushCube(vec3 top_pos,std::function<BlockType(vec3)> voxel_sampler) 
 
 void Chunk::GenerateMesh(std::function<BlockType(vec3)> voxel_sampler) {
     mesh.Clear();
+    translucent.Clear();
     for (float x=0; x<CHUNK_SIZE; x++) {
         for (float y=0; y<CHUNK_HEIGHT; y++) {
             for (float z=0; z<CHUNK_SIZE; z++) {
@@ -119,12 +133,15 @@ void Chunk::GenerateMesh(std::function<BlockType(vec3)> voxel_sampler) {
         }
     }
     mesh.UpdeteMesh();
+    translucent.UpdeteMesh();
 }
 
 void Chunk::Draw() {
     mesh.Draw();
+    translucent.Draw();
 }
 
 void Chunk::Clean() {
     mesh.Clean();
+    translucent.Clean();
 }

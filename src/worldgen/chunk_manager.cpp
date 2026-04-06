@@ -1,6 +1,7 @@
 #include "worldgen/chunk_manager.h"
 #include "worldgen/chunk.h"
 #include "worldgen/extern/FastNoise.h"
+#include <cstdlib>
 #include <functional>
 #include <iostream>
 #include <utility>
@@ -118,9 +119,10 @@ void ChunkManager::Update(vec3 player_pos) {
     }
 
     FastNoise n;
-    n.SetNoiseType(FastNoise::PerlinFractal);
+    n.SetSeed(0);
+    n.SetNoiseType(FastNoise::NoiseType::CubicFractal);
     auto noise = [&](float x,float y) -> float {
-        return n.GetPerlinFractal(x,y)*30 + 30;
+        return n.GetCubicFractal(x,y)*30 + 30;
     };
 
     auto sampler = [&](vec3 pos) -> BlockType {return GetBlock(pos);};
