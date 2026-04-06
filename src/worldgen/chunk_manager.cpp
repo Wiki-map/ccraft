@@ -1,9 +1,9 @@
 #include "worldgen/chunk_manager.h"
 #include "worldgen/chunk.h"
 #include "worldgen/extern/FastNoise.h"
+#include <algorithm>
 #include <cstdlib>
 #include <functional>
-#include <iostream>
 #include <utility>
 
 ChunkManager::ChunkManager(int render_distance) {
@@ -155,11 +155,31 @@ void ChunkManager::Update(vec3 player_pos) {
 }
 
 void ChunkManager::Draw() {
+
+    struct val {
+        int i,j;
+    };
+
+    std::vector<val> c;
+
     for (int i=0; i<render_distance*2 + 1; i++) {
         for (int j=0; j<render_distance*2 + 1; j++) {
             if (!isGenerated[i][j]) continue;
-            chunks[i][j].Draw();
+            c.push_back({i,j});
         }
+    }
+
+    std::sort(c.begin(),c.end(),[&](val a,val b) -> bool {
+        float adi = std::abs(a.i - render_distance);
+        float adj = std::abs(a.j - render_distance);
+        float bdi = std::abs(b.i - render_distance);
+        float bdj = std::abs(b.j - render_distance);
+
+        return adi*adi + adj*adj > bdi*bdi + bdj*bdj;
+    });
+
+    for (auto [i,j]: c) {
+        chunks[i][j].Draw();
     }
 }
 

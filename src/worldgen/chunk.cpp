@@ -145,3 +145,5 @@ void Chunk::Clean() {
     mesh.Clean();
     translucent.Clean();
 }
+
+vec2 Chunk::GetPosition() {return position;}
