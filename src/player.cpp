@@ -1,6 +1,5 @@
 #include "player.h"
 #include "engine/window.h"
-#include "iostream"
 
 Player::Player(vec3 pos) {
     position = pos;

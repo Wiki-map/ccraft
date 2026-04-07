@@ -1,7 +1,6 @@
 #include "worldgen/chunk.h"
 #include <array>
 #include <functional>
-#include <iostream>
 
 Chunk::Chunk(vec2 pos) {
     position = pos;

@@ -11,12 +11,16 @@ struct ChunkManager {
     void Clean();
     BlockType GetBlock(vec3 pos);
     vec2 GetChunk(vec3 pos);
-    void GenChunk(int i,int j,std::function<BlockType(vec3)> sampler);
 private:
+
+    void ShiftMap(int diffi,int diffj);
+    bool TryGen();
+    bool TryMesh();
 
     vec2 postion;
     vec2 last_player_position;
     int render_distance;
     std::vector<std::vector<Chunk>> chunks;
     std::vector<std::vector<bool>> isGenerated;
+    std::vector<std::vector<bool>> tryMeshBuild;
 };

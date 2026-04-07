@@ -1,11 +1,8 @@
 #include "worldgen/chunk_manager.h"
 #include "worldgen/chunk.h"
 #include "worldgen/extern/FastNoise.h"
-#include <algorithm>
-#include <array>
 #include <cstdlib>
 #include <functional>
-#include <iterator>
 #include <queue>
 #include <utility>
 #include <vector>
@@ -16,6 +13,7 @@ ChunkManager::ChunkManager(int render_distance) {
     last_player_position = {0,0};
     chunks = std::vector<std::vector<Chunk>>(render_distance*2 + 1,std::vector<Chunk>(render_distance*2 + 1));
     isGenerated = std::vector<std::vector<bool>>(render_distance*2 + 1,std::vector<bool>(render_distance*2 + 1,false));
+    tryMeshBuild = std::vector<std::vector<bool>>(render_distance*2 + 1,std::vector<bool>(render_distance*2 + 1,false));
 }
 
 vec2 ChunkManager::GetChunk(vec3 pos) {
@@ -41,18 +39,7 @@ BlockType ChunkManager::GetBlock(vec3 pos) {
     return chunks[i][j].GetBlock(pos);
 }
 
-void ChunkManager::GenChunk(int i,int j,std::function<BlockType(vec3)> sampler) {
-    chunks[i][j].GenerateMesh(sampler);
-}
-
-void ChunkManager::Update(vec3 player_pos) {
-    vec2 player_chunk = GetChunk(player_pos);
-    vec2 diff = player_chunk - last_player_position;
-    int diffi = diff.x;
-    int diffj = diff.y;
-
-    if (diffi || diffj) last_player_position = player_chunk;
-
+void ChunkManager::ShiftMap(int diffi,int diffj) {
     postion.x += diffi * CHUNK_SIZE * BLOCK_SIZE;
     postion.y += diffj * CHUNK_SIZE * BLOCK_SIZE;
 
@@ -65,6 +52,7 @@ void ChunkManager::Update(vec3 player_pos) {
                 }
                 chunks[i+diffi][j] = std::move(chunks[i][j]);
                 isGenerated[i+diffi][j] = isGenerated[i][j];
+                tryMeshBuild[i+diffi][j] = tryMeshBuild[i][j];
                 if (i < diffi) {
                     isGenerated[i][j] = false;
                 }
@@ -81,6 +69,7 @@ void ChunkManager::Update(vec3 player_pos) {
                 }
                 chunks[i-diffi][j] = std::move(chunks[i][j]);
                 isGenerated[i-diffi][j] = isGenerated[i][j];
+                tryMeshBuild[i-diffi][j] = tryMeshBuild[i][j];
                 if (i >= render_distance*2+1 - diffi) {
                     isGenerated[i][j] = false;
                 }
@@ -97,6 +86,7 @@ void ChunkManager::Update(vec3 player_pos) {
                 }
                 chunks[i][j-diffj] = std::move(chunks[i][j]);
                 isGenerated[i][j-diffj] = isGenerated[i][j];
+                tryMeshBuild[i][j-diffi] = tryMeshBuild[i][j];
                 if (j >= render_distance*2+1 - diffj) {
                     isGenerated[i][j] = false;
                 }
@@ -115,13 +105,16 @@ void ChunkManager::Update(vec3 player_pos) {
                 }
                 chunks[i][j+diffj] = std::move(chunks[i][j]);
                 isGenerated[i][j+diffj] = isGenerated[i][j];
+                tryMeshBuild[i][j + diffi] = tryMeshBuild[i][j];
                 if (j < diffj) {
                     isGenerated[i][j] = false;
                 }
             }
         }
     }
+}
 
+bool ChunkManager::TryGen() {
     FastNoise n;
     n.SetSeed(0);
     n.SetNoiseType(FastNoise::NoiseType::CubicFractal);
@@ -143,12 +136,13 @@ void ChunkManager::Update(vec3 player_pos) {
             chunks[i][j].Init();
             chunks[i][j].GenerateVoxels(noise);
             isGenerated[i][j] = true;
+            chunks[i][j].GenerateMesh(sampler);
 
-            GenChunk(i,j,sampler);
-            if (i > 0 && isGenerated[i-1][j]) GenChunk(i-1,j,sampler);
-            if (j > 0 && isGenerated[i][j-1]) GenChunk(i,j-1,sampler);
-            if (i < render_distance*2 && isGenerated[i+1][j]) GenChunk(i+1,j,sampler);
-            if (j < render_distance*2 && isGenerated[i][j+1]) GenChunk(i,j+1,sampler);
+
+            if (i > 0 && isGenerated[i-1][j]) tryMeshBuild[i-1][j] = 1;
+            if (j > 0 && isGenerated[i][j-1]) tryMeshBuild[i][j-1] = 1;
+            if (i < render_distance*2 && isGenerated[i+1][j]) tryMeshBuild[i+1][j] = 1;
+            if (j < render_distance*2 && isGenerated[i][j+1]) tryMeshBuild[i][j-1] = 1;
 
 
             hasgen = true;
@@ -156,8 +150,43 @@ void ChunkManager::Update(vec3 player_pos) {
         }
         if (hasgen) break;
     }
+
+    return hasgen;
 }
 
+bool ChunkManager::TryMesh() {
+    bool hasgen = false;
+
+    auto sampler = [&](vec3 pos) -> BlockType {return GetBlock(pos);};
+
+    for (int i=0; i<render_distance*2+1; i++) {
+        for (int j=0; j<render_distance*2+1; j++) {
+            if (tryMeshBuild[i][j] == false) continue;
+            chunks[i][j].GenerateMesh(sampler);
+            tryMeshBuild[i][j] = false;
+            hasgen = true;
+        }
+        if (hasgen) break;
+    }
+    return hasgen;
+}
+
+void ChunkManager::Update(vec3 player_pos) {
+    vec2 player_chunk = GetChunk(player_pos);
+    vec2 diff = player_chunk - last_player_position;
+    int diffi = diff.x;
+    int diffj = diff.y;
+
+    if (diffi || diffj)  {
+        last_player_position = player_chunk;
+        ShiftMap(diffi,diffj);
+    }
+
+    bool hasgen = TryGen();
+    if (!hasgen) TryMesh();
+}
+
+// O(n^2) translucency with a bfs
 void ChunkManager::Draw() {
     struct vec2i {
         int i,j;
