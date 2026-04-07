@@ -18,6 +18,16 @@ Color rgba(uint8_t r,uint8_t g,uint8_t b,uint8_t a) {
     return {r,g,b,a};
 }
 
+uint32_t rgba32(uint8_t r,uint8_t g,uint8_t b,uint8_t a) {
+    return rgba32({r,g,b,a});
+}
+uint32_t rgba32(Color color) {
+    void * val = &color;
+    uint32_t *p = (uint32_t *)val;
+    return *p;
+}
+
+
 void ClearBackground(Color c) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor((float)c.r/255.0f,(float)c.g/255.0f, (float)c.b/255.0f, (float)c.a/255.0f);

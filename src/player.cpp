@@ -45,20 +45,20 @@ void Player::Update(float dt) {
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 
+    direction2.x = cos(glm::radians(yaw));
+    direction2.z = sin(glm::radians(yaw));
+    direction2.y = 0;
+
     float speed = 10;
     if (IsKeyDown(KeyboardKey::LEFT_CONTROL)) speed += 5;
     if (IsKeyDown(KeyboardKey::RIGHT_SHIFT)) speed -= 5;
     speed *= dt;
 
     if (IsKeyDown(KeyboardKey::W)) {
-        position.x += cos(glm::radians(yaw)) * speed * 1.3;
-        position.y += 0 * speed;
-        position.z += sin(glm::radians(yaw)) * speed * 1.3;
+        position += direction2 * speed * 1.3;
     }
     if (IsKeyDown(KeyboardKey::S)) {
-        position.x -= cos(glm::radians(yaw)) * speed * 1.3;
-        position.y -= 0 * speed;
-        position.z -= sin(glm::radians(yaw)) * speed * 1.3;
+        position -= direction2 * speed * 1.3;
     }
 
     if (IsKeyDown(KeyboardKey::SPACE)) {

@@ -18,7 +18,7 @@ int main(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    ChunkManager chunk_manager(3);
+    ChunkManager chunk_manager(24);
 
     Player player = Player({0,100,0});
 

@@ -1,4 +1,5 @@
 #include "worldgen/chunk.h"
+#include "engine/mesh.h"
 #include <array>
 #include <functional>
 
@@ -9,10 +10,10 @@ Chunk::Chunk(vec2 pos) {
 }
 
 void Chunk::Init() {
-    const int max_block_per_position = 256;
+    const int max_block_per_position = 2;
     const int triangle_per_cube = 12;
     mesh = Mesh(CHUNK_SIZE * CHUNK_SIZE * max_block_per_position * triangle_per_cube);
-    translucent = Mesh(CHUNK_SIZE * CHUNK_SIZE * triangle_per_cube);
+    translucent = Mesh(CHUNK_SIZE * CHUNK_SIZE * 2);
 }
 
 void Chunk::GenerateVoxels(std::function<float(float,float)> noise_function) {
@@ -78,43 +79,37 @@ void Chunk::PushCube(vec3 top_pos,std::function<BlockType(vec3)> voxel_sampler) 
     if (top_pos.y < WATTER_LEVEL*BLOCK_SIZE && voxel_sampler(top_pos + (vec3){0,BLOCK_SIZE,0}) == BlockType::AIR) {
         vec3 norm = {0,1,0};
         Color colorw = rgba(44, 110, 232,150);
-        vec3 topw = top_pos; topw.y = WATTER_LEVEL;
+        vec3 topw = top_pos; topw.y = WATTER_LEVEL*BLOCK_SIZE;
         vec3 top_top_rightw = topw; top_top_rightw.x += BLOCK_SIZE;
         vec3 top_bot_leftw = topw; top_bot_leftw.z += BLOCK_SIZE;
         vec3 top_bot_rightw = top_bot_leftw; top_bot_rightw.x += BLOCK_SIZE;
-        translucent.PushQuad(topw,top_top_rightw,top_bot_leftw,top_bot_rightw,colorw,norm, 1);
+        translucent.PushQuad(topw,top_top_rightw,top_bot_leftw,top_bot_rightw,colorw,NormalDir::UP);
     }
 
     if (voxel_sampler(top_pos + (vec3){0,BLOCK_SIZE,0}) == BlockType::AIR) {
-        vec3 norm = {0,1,0};
-        mesh.PushQuad(top_pos,top_top_right,top_bot_left,top_bot_right,color,norm, 1);
+        mesh.PushQuad(top_pos,top_top_right,top_bot_left,top_bot_right,color,NormalDir::UP);
     }
 
     if (voxel_sampler(top_pos + (vec3){0,-BLOCK_SIZE,0}) == BlockType::AIR) {
-        vec3 norm = {0,-1,0};
-        mesh.PushQuad(bot_bot_left,bot_bot_right,bot_pos,bot_top_right,color,norm,1);
+        mesh.PushQuad(bot_bot_left,bot_bot_right,bot_pos,bot_top_right,color,NormalDir::DOWN);
     }
 
 
     //left face
     if (voxel_sampler(top_pos + (vec3){-BLOCK_SIZE,0,0}) == BlockType::AIR) { 
-        vec3 norm = {-1,0,0};
-        mesh.PushQuad(top_pos,top_bot_left,bot_pos,bot_bot_left,color,norm,1);
+        mesh.PushQuad(top_pos,top_bot_left,bot_pos,bot_bot_left,color,NormalDir::LEFT);
     }
 
     if (voxel_sampler(top_pos + (vec3){BLOCK_SIZE,0,0}) == BlockType::AIR) {
-        vec3 norm = {1,0,0};
-        mesh.PushQuad(top_bot_right,top_top_right,bot_bot_right,bot_top_right,color,norm,1);
+        mesh.PushQuad(top_bot_right,top_top_right,bot_bot_right,bot_top_right,color,NormalDir::RIGHT);
     }
 
     //front face
     if (voxel_sampler(top_pos + (vec3){0,0,BLOCK_SIZE}) == BlockType::AIR) {
-        vec3 norm = {0,0,-1};
-        mesh.PushQuad(top_bot_left,top_bot_right,bot_bot_left,bot_bot_right,color,norm,1);
+        mesh.PushQuad(top_bot_left,top_bot_right,bot_bot_left,bot_bot_right,color,NormalDir::FRONT);
     }
     if (voxel_sampler(top_pos + (vec3){0,0,-BLOCK_SIZE}) == BlockType::AIR) {
-        vec3 norm = {0,0,1};
-        mesh.PushQuad(top_top_right,top_pos,bot_top_right,bot_pos,color,norm,1);
+        mesh.PushQuad(top_top_right,top_pos,bot_top_right,bot_pos,color,NormalDir::BACK);
     }
 
 }

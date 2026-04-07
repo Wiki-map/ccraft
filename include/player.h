@@ -4,10 +4,11 @@
 #include "camera.h"
 
 class Player {
-    
     vec3 position;
     vec3 direction;
     vec3 up;
+
+    vec3 direction2;
 
     float pitch,yaw;
 

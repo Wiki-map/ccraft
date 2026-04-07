@@ -20,19 +20,14 @@ Mesh::Mesh(int32_t max_size) {
     glGenBuffers(1,&vbo);
     glBindBuffer(GL_ARRAY_BUFFER,vbo);
 
-    glBufferData(GL_ARRAY_BUFFER,sizeof(Vertex)*max_size*3,nullptr,GL_DYNAMIC_DRAW);
-
     glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*) offsetof(Vertex,pos));
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*) offsetof(Vertex,color));
+    glVertexAttribPointer(1,1,GL_UNSIGNED_INT,GL_FALSE,sizeof(Vertex),(void*) offsetof(Vertex,color));
     glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)offsetof(Vertex,norm));
+    glVertexAttribPointer(2,1,GL_UNSIGNED_BYTE,GL_FALSE,sizeof(Vertex),(void*)offsetof(Vertex,norm));
     glEnableVertexAttribArray(2);
-
-    glVertexAttribPointer(3,1,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)offsetof(Vertex, tint));
-    glEnableVertexAttribArray(3);
 
     triangle_count = 0;
 
@@ -49,7 +44,7 @@ void Mesh::UpdeteMesh() {
 
     glBindBuffer(GL_ARRAY_BUFFER,vbo);
 
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex)*triangle_count*3,vertices);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*triangle_count*3,vertices,GL_STATIC_DRAW);
 
     //std::cout<<"[INFO]: Updated mesh\n";
 }
@@ -57,30 +52,19 @@ void Mesh::UpdeteMesh() {
 void Mesh::PushTriangle(
     vec3 p1,vec3 p2,vec3 p3,
     Color color,
-    vec3 norm,
-    float tint
+    NormalDir norm
 ) {
-
-    if (triangle_count >= max_triangle_count) {
-        std::cerr<<"[ERROR]: max mesh quad count exided : "<<max_triangle_count<<"\n";
-        exit(-1);
-        return;
-    }
     vertices[triangle_count*3].pos = p1;
     vertices[triangle_count*3 + 1].pos = p2;
     vertices[triangle_count*3 + 2].pos = p3;
 
-    vertices[triangle_count*3].color = frgba(color);
-    vertices[triangle_count*3+1].color = frgba(color);
-    vertices[triangle_count*3+2].color = frgba(color);
+    vertices[triangle_count*3].color = rgba32(color);
+    vertices[triangle_count*3+1].color = rgba32(color);
+    vertices[triangle_count*3+2].color = rgba32(color);
 
-    vertices[triangle_count*3].norm = norm;
-    vertices[triangle_count*3 + 1].norm = norm;
-    vertices[triangle_count*3 + 2].norm = norm;
-
-    vertices[triangle_count*3].tint = tint;
-    vertices[triangle_count*3 + 1].tint = tint;
-    vertices[triangle_count*3 + 2].tint = tint;
+    vertices[triangle_count*3].norm = (uint8_t)norm;
+    vertices[triangle_count*3 + 1].norm = (uint8_t)norm;
+    vertices[triangle_count*3 + 2].norm = (uint8_t)norm;
 
     triangle_count++;
 }
@@ -88,11 +72,10 @@ void Mesh::PushTriangle(
 void Mesh::PushQuad(
     vec3 top,vec3 right, vec3 left, vec3 bot,
     Color color,
-    vec3 norm,
-    float tint
+    NormalDir norm
 ) {
-    PushTriangle(top,right,left,color,norm,tint);
-    PushTriangle(left,right,bot,color,norm,tint);
+    PushTriangle(top,right,left,color,norm);
+    PushTriangle(left,right,bot,color,norm);
 }
 
 
