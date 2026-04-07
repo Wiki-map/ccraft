@@ -10,7 +10,7 @@ int main(){
     InitWindow(800,800,"gl");
 
     Shader s = Shader(RESOURCE_PATH "vertex.glsl", RESOURCE_PATH "fragment.glsl");
-    s.SetVector3Uniform("u_light_pos", glm::vec3(0,100000,0));
+    s.SetVector3Uniform("u_light_pos", glm::vec3(0,1e9,0));
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
@@ -18,9 +18,9 @@ int main(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    ChunkManager chunk_manager(24);
+    ChunkManager chunk_manager(16);
 
-    Player player = Player({0,100,0});
+    Player player = Player({0,40,0});
 
     bool cr = true;
     EnableCursor();

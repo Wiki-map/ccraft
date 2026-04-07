@@ -1,5 +1,7 @@
 #include "player.h"
 #include "engine/window.h"
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/ext/matrix_transform.hpp"
 
 Player::Player(vec3 pos) {
     position = pos;
@@ -11,10 +13,6 @@ Player::Player(vec3 pos) {
 
     last_mouse = {300,300};
     has_enterd = false;
-}
-
-static int sigen(float val) {
-    return val / std::abs(val);
 }
 
 void Player::Update(float dt) {
@@ -92,4 +90,27 @@ vec3 Player::GetDirection() {
 }
 vec3 Player::GetRight() {
     return vec3Normalize(vec3Cross(direction,up));
+}
+
+vec3 Player::GetDirection2() {
+    return direction2;
+}
+
+glm::mat4 Player::GetViewMatrix() {
+    Camera camera = GetCamera();
+    glm::vec3 glm_position = Vec3ToGLM(camera.position);
+    glm::vec3 glm_target = Vec3ToGLM(camera.target);
+
+    glm::mat4 view = glm::lookAt(glm_position,glm_target,glm::vec3(0,1,0));
+
+    return view;
+}
+
+glm::mat4 Player::GetPerspectivMatrix() {
+    Camera camera = GetCamera();
+    glm::vec3 glm_position = Vec3ToGLM(camera.position);
+    glm::vec3 glm_target = Vec3ToGLM(camera.target);
+
+    glm::mat4 proj = glm::perspective(glm::radians(camera.fov),GetWindowAspect(),camera.near,camera.far);
+    return proj;
 }

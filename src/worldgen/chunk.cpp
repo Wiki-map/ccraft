@@ -26,8 +26,9 @@ void Chunk::GenerateVoxels(std::function<float(float,float)> noise_function) {
     }
 
     for (float x=0; x<CHUNK_SIZE; x++) {
-        for (float y=0; y<CHUNK_HEIGHT; y++) {
-            for (float z=0; z<CHUNK_SIZE; z++) {
+        for (float z=0; z<CHUNK_SIZE; z++) {
+            for (float y=0; y<CHUNK_HEIGHT; y++) {
+                if (y > heights[x][z]) break;
                 int32_t idx = x*CHUNK_SIZE * CHUNK_HEIGHT + y * CHUNK_SIZE + z;
                 if (y > heights[x][z]) voxels[idx] = BlockType::AIR;
                 else if (y == heights[x][z] && y > WATTER_LEVEL) voxels[idx] = BlockType::GRASS;

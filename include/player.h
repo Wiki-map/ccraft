@@ -23,5 +23,9 @@ public:
 
     vec3 GetPosition();
     vec3 GetDirection();
+    vec3 GetDirection2();
     vec3 GetRight();
+
+    glm::mat4 GetViewMatrix();
+    glm::mat4 GetPerspectivMatrix();
 };

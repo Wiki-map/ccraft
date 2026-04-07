@@ -1,4 +1,6 @@
 #include "worldgen/chunk_manager.h"
+#include "player.h"
+#include "utils.h"
 #include "worldgen/chunk.h"
 #include "worldgen/extern/FastNoise.h"
 #include <cstdlib>
@@ -175,17 +177,41 @@ bool ChunkManager::TryGen() {
 }
 
 bool ChunkManager::TryMesh() {
-    bool hasgen = false;
 
     auto sampler = [&](vec3 pos) -> BlockType {return GetBlock(pos);};
 
-    for (int i=0; i<render_distance*2+1; i++) {
-        for (int j=0; j<render_distance*2+1; j++) {
-            if (tryMeshBuild[i][j] == false) continue;
-            chunks[i][j].GenerateMesh(sampler);
-            tryMeshBuild[i][j] = false;
-            hasgen = true;
-            break;
+    auto gen = [&](int i,int j) {
+        chunks[i][j].GenerateMesh(sampler);
+        tryMeshBuild[i][j] = false;
+    };
+
+    bool hasgen = false;
+    for (int d=render_distance; d>=0; d--) {
+        for (int j=d; j<render_distance*2+1-d; j++) {
+            if (tryMeshBuild[d][j]) {
+                gen(d,j);
+                hasgen = true;
+                break;
+            }
+            if (tryMeshBuild[render_distance*2 - d][j]) {
+                gen(render_distance*2 -d,j);
+                hasgen = true;
+                break;
+            }
+        }
+        if (hasgen) break;
+
+        for (int i=d+1; i<render_distance*2 -d; i++) {
+            if (tryMeshBuild[i][d]) {
+                gen(i,d);
+                hasgen = true;
+                break;
+            }
+            if (tryMeshBuild[i][render_distance*2-d]) {
+                gen(i,render_distance*2-d);
+                hasgen = true;
+                break;
+            }
         }
         if (hasgen) break;
     }
@@ -231,7 +257,9 @@ void ChunkManager::Draw() {
 
     while (!q.empty()) {
         int ti = q.front().i,tj = q.front().j;
-        if (isGenerated[ti][tj]) chunks[ti][tj].Draw();
+
+        if (isGenerated[ti][tj] /*&& (IsSeen(p,pos) || IsSeen(p,pos + (vec3){CHUNK_SIZE*BLOCK_SIZE,0,CHUNK_SIZE*BLOCK_SIZE}))*/) chunks[ti][tj].Draw();
+
         for (int f=0; f<4; f++) {
             int i = ti + di[f],j = tj + dj[f];
             if (i < 0 || j < 0 || i > render_distance*2 || j > render_distance*2) continue;
