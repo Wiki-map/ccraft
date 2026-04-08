@@ -5,7 +5,7 @@
 #include "camera.h"
 #include "player.h"
 #include "worldgen/chunk_manager.h"
-#include "worldgen/extern/FastNoise.h"
+#include "worldgen/extern/FastNoiseLite.h"
 
 int main(){
     InitWindow(800,800,"gl");
@@ -21,11 +21,14 @@ int main(){
 
     ChunkManager chunk_manager(16);
 
-    FastNoise n;
-    n.SetNoiseType(FastNoise::PerlinFractal);
+    FastNoiseLite n;
+    n.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
+    n.SetFrequency(0.08);
+    n.SetCellularReturnType(FastNoiseLite::CellularReturnType_CellValue);
+    n.SetCellularDistanceFunction(FastNoiseLite::CellularDistanceFunction_Hybrid);
 
     auto getnoise = [&](float a,float b) -> float {
-        return n.GetPerlinFractal(a,b)*30 + 30;
+        return n.GetNoise(a,b)*6 + 28;
     };
 
     chunk_manager.SetNoiseFuction(getnoise);
