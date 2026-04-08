@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "player.h"
 #include "worldgen/chunk_manager.h"
+#include "worldgen/extern/FastNoise.h"
 
 int main(){
     InitWindow(800,800,"gl");
@@ -19,6 +20,15 @@ int main(){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     ChunkManager chunk_manager(16);
+
+    FastNoise n;
+    n.SetNoiseType(FastNoise::PerlinFractal);
+
+    auto getnoise = [&](float a,float b) -> float {
+        return n.GetPerlinFractal(a,b)*30 + 30;
+    };
+
+    chunk_manager.SetNoiseFuction(getnoise);
 
     Player player = Player({0,40,0});
 

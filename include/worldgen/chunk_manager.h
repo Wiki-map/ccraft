@@ -2,10 +2,12 @@
 
 #include "utils.h"
 #include <vector>
+#include <functional>
 #include "worldgen/chunk.h"
 
 struct ChunkManager {
     ChunkManager(int render_distance);
+    void SetNoiseFuction(std::function<float(float,float)> fun);
     void Update(vec3 player_pos);
     void Draw();
     void Clean();
@@ -20,7 +22,9 @@ private:
     vec2 postion;
     vec2 last_player_position;
     int render_distance;
+    int render_distance_p;
+    std::function<float(float,float)> noise;
     std::vector<std::vector<Chunk>> chunks;
     std::vector<std::vector<bool>> isGenerated;
-    std::vector<std::vector<bool>> tryMeshBuild;
+    std::vector<std::vector<bool>> isMeshGenerated;
 };
