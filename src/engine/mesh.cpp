@@ -5,15 +5,8 @@
 #include <iostream>
 #include <stdlib.h>
 
-static int mesh_id = 0;
 
-Mesh::Mesh(int32_t max_size) {
-
-    max_triangle_count = max_size;
-
-    vertices = new Vertex[max_size*3];
-    mesh_id++;
-
+void Mesh::Init() {
     glGenVertexArrays(1,&vao);
     glBindVertexArray(vao);
 
@@ -30,23 +23,20 @@ Mesh::Mesh(int32_t max_size) {
     glEnableVertexAttribArray(2);
 
     triangle_count = 0;
-
-    //std::cout<<"[INFO]: initialized mesh with max triangle count: "<<max_triangle_count<<"\n";
 }
 
 void Mesh::Clear() {
     triangle_count = 0;
+    vertices.clear();
 }
 
 void Mesh::UpdeteMesh() {
-
-    glBindVertexArray(vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER,vbo);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*triangle_count*3,vertices,GL_STATIC_DRAW);
-
-    //std::cout<<"[INFO]: Updated mesh\n";
+    #ifdef __APPLE__
+        glBindBuffer(GL_ARRAY_BUFFER,vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*vertices.size(),vertices.data(),GL_STATIC_DRAW);
+    #else
+        glNamedBufferData(vbo,sizeof(Vertex)*vertices.size(),vertices.data(),GL_STATIC_DRAW);
+    #endif
 }
 
 void Mesh::PushTriangle(
@@ -54,6 +44,11 @@ void Mesh::PushTriangle(
     Color color,
     NormalDir norm
 ) {
+
+    vertices.push_back({});
+    vertices.push_back({});
+    vertices.push_back({});
+
     vertices[triangle_count*3].pos = p1;
     vertices[triangle_count*3 + 1].pos = p2;
     vertices[triangle_count*3 + 2].pos = p3;
@@ -87,8 +82,6 @@ void Mesh::Draw() {
 }
 
 void Mesh::Clean() {
-    delete[] vertices;
-
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
 }

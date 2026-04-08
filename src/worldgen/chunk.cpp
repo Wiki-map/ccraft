@@ -12,8 +12,8 @@ Chunk::Chunk(vec2 pos) {
 void Chunk::Init() {
     const int max_block_per_position = 2;
     const int triangle_per_cube = 12;
-    mesh = Mesh(CHUNK_SIZE * CHUNK_SIZE * max_block_per_position * triangle_per_cube);
-    translucent = Mesh(CHUNK_SIZE * CHUNK_SIZE * 2);
+    mesh.Init();
+    translucent.Init();
 }
 
 void Chunk::GenerateVoxels(std::function<float(float,float)> noise_function) {

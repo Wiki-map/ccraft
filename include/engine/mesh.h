@@ -22,7 +22,8 @@ struct Mesh {
     };
 
     Mesh() = default;
-    Mesh(int32_t max_size);
+
+    void Init();
 
     void UpdeteMesh();
     void Clear();
@@ -54,7 +55,6 @@ private:
 
     uint32_t vao,vbo;
 
-    Vertex* vertices;
+    std::vector<Vertex> vertices;
     int32_t triangle_count;
-    int32_t max_triangle_count;
 };

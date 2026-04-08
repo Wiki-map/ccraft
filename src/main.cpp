@@ -19,16 +19,15 @@ int main(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    ChunkManager chunk_manager(16);
+    ChunkManager chunk_manager(24);
 
     FastNoiseLite n;
-    n.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
-    n.SetFrequency(0.08);
-    n.SetCellularReturnType(FastNoiseLite::CellularReturnType_CellValue);
-    n.SetCellularDistanceFunction(FastNoiseLite::CellularDistanceFunction_Hybrid);
+    n.SetNoiseType(FastNoiseLite::NoiseType_ValueCubic);
+    //n.SetFractalType(FastNoiseLite::FractalType_PingPong);
+    n.SetFrequency(0.02);
 
     auto getnoise = [&](float a,float b) -> float {
-        return n.GetNoise(a,b)*6 + 28;
+        return n.GetNoise(a,b)*30 + 32;
     };
 
     chunk_manager.SetNoiseFuction(getnoise);
