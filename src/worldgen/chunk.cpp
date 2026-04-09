@@ -1,7 +1,9 @@
 #include "worldgen/chunk.h"
 #include "engine/mesh.h"
 #include <array>
+#include <chrono>
 #include <functional>
+#include <iostream>
 
 Chunk::Chunk(vec2 pos) {
     position = pos;
@@ -17,6 +19,9 @@ void Chunk::Init() {
 }
 
 void Chunk::GenerateVoxels(std::function<float(float,float)> noise_function) {
+
+    auto a = std::chrono::high_resolution_clock::now();
+
     std::array<std::array<int,CHUNK_SIZE>,CHUNK_SIZE> heights;
 
     for (float i=0; i<CHUNK_SIZE; i++) {
@@ -28,7 +33,7 @@ void Chunk::GenerateVoxels(std::function<float(float,float)> noise_function) {
     for (float x=0; x<CHUNK_SIZE; x++) {
         for (float z=0; z<CHUNK_SIZE; z++) {
             for (float y=0; y<CHUNK_HEIGHT; y++) {
-                if (y > heights[x][z]) break;
+                //if (y > heights[x][z]) break;
                 int32_t idx = x*CHUNK_SIZE * CHUNK_HEIGHT + y * CHUNK_SIZE + z;
                 if (y > heights[x][z]) voxels[idx] = BlockType::AIR;
                 else if (y == heights[x][z] && y > WATTER_LEVEL) voxels[idx] = BlockType::GRASS;
@@ -42,6 +47,11 @@ void Chunk::GenerateVoxels(std::function<float(float,float)> noise_function) {
             }
         }
     }
+
+    auto b = std::chrono::high_resolution_clock::now();
+    float time = std::chrono::duration_cast<std::chrono::nanoseconds>(b-a).count();
+    std::cout<<"voxel generation : "<<time / 1e6<<"\n";
+
 }
 
 BlockType Chunk::GetBlock(vec3 pos) {
@@ -116,6 +126,7 @@ void Chunk::PushCube(vec3 top_pos,std::function<BlockType(vec3)> voxel_sampler) 
 }
 
 void Chunk::GenerateMesh(std::function<BlockType(vec3)> voxel_sampler) {
+    auto a = std::chrono::high_resolution_clock::now();
     mesh.Clear();
     translucent.Clear();
     for (float x=0; x<CHUNK_SIZE; x++) {
@@ -129,6 +140,10 @@ void Chunk::GenerateMesh(std::function<BlockType(vec3)> voxel_sampler) {
     }
     mesh.UpdeteMesh();
     translucent.UpdeteMesh();
+
+    auto b = std::chrono::high_resolution_clock::now();
+    float time = std::chrono::duration_cast<std::chrono::nanoseconds>(b-a).count();
+    std::cout<<"mesh generation :"<<time / 1e6<<"\n";
 }
 
 void Chunk::Draw() {

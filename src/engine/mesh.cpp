@@ -69,8 +69,8 @@ void Mesh::PushQuad(
     Color color,
     NormalDir norm
 ) {
-    PushTriangle(top,right,left,color,norm);
-    PushTriangle(left,right,bot,color,norm);
+    PushTriangle(top,left,right,color,norm);
+    PushTriangle(right,left,bot,color,norm);
 }
 
 

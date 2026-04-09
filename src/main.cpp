@@ -14,7 +14,7 @@ int main(){
     s.SetVector3Uniform("u_light_pos", glm::vec3(0,1e9,0));
 
     glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+    glCullFace(GL_BACK);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -22,12 +22,12 @@ int main(){
     ChunkManager chunk_manager(24);
 
     FastNoiseLite n;
-    n.SetNoiseType(FastNoiseLite::NoiseType_ValueCubic);
+    n.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
     //n.SetFractalType(FastNoiseLite::FractalType_PingPong);
-    n.SetFrequency(0.02);
+    n.SetFrequency(0.01);
 
     auto getnoise = [&](float a,float b) -> float {
-        return n.GetNoise(a,b)*30 + 32;
+        return n.GetNoise(a,b)*10 + 28;
     };
 
     chunk_manager.SetNoiseFuction(getnoise);
