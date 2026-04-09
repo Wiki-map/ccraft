@@ -22,9 +22,12 @@ uint32_t rgba32(uint8_t r,uint8_t g,uint8_t b,uint8_t a) {
     return rgba32({r,g,b,a});
 }
 uint32_t rgba32(Color color) {
-    void * val = &color;
-    uint32_t *p = (uint32_t *)val;
-    return *p;
+    uint32_t r = color.r,g = color.g,b = color.b,a = color.a;
+    uint32_t rez = r;
+    rez += (g << 8);
+    rez += (b << 16);
+    rez += (a << 24);
+    return rez;
 }
 
 

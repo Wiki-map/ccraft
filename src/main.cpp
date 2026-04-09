@@ -6,12 +6,17 @@
 #include "player.h"
 #include "worldgen/chunk_manager.h"
 #include "worldgen/extern/FastNoiseLite.h"
+#include <iostream>
 
 int main(){
     InitWindow(800,800,"gl");
 
+
+
     Shader s = Shader(RESOURCE_PATH "vertex.glsl", RESOURCE_PATH "fragment.glsl");
     s.SetVector3Uniform("u_light_pos", glm::vec3(0,1e9,0));
+
+
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -19,18 +24,20 @@ int main(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    ChunkManager chunk_manager(24);
 
+
+    ChunkManager chunk_manager(24);
     FastNoiseLite n;
     n.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
     //n.SetFractalType(FastNoiseLite::FractalType_PingPong);
     n.SetFrequency(0.01);
-
     auto getnoise = [&](float a,float b) -> float {
         return n.GetNoise(a,b)*10 + 28;
     };
-
     chunk_manager.SetNoiseFuction(getnoise);
+
+
+
 
     Player player = Player({0,40,0});
 

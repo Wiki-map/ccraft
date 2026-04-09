@@ -12,15 +12,13 @@ Chunk::Chunk(vec2 pos) {
 }
 
 void Chunk::Init() {
-    const int max_block_per_position = 2;
-    const int triangle_per_cube = 12;
     mesh.Init();
     translucent.Init();
 }
 
 void Chunk::GenerateVoxels(std::function<float(float,float)> noise_function) {
 
-    auto a = std::chrono::high_resolution_clock::now();
+    //auto a = std::chrono::high_resolution_clock::now();
 
     std::array<std::array<int,CHUNK_SIZE>,CHUNK_SIZE> heights;
 
@@ -48,9 +46,9 @@ void Chunk::GenerateVoxels(std::function<float(float,float)> noise_function) {
         }
     }
 
-    auto b = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration_cast<std::chrono::nanoseconds>(b-a).count();
-    std::cout<<"voxel generation : "<<time / 1e6<<"\n";
+    //auto b = std::chrono::high_resolution_clock::now();
+    //float time = std::chrono::duration_cast<std::chrono::nanoseconds>(b-a).count();
+    //std::cout<<"voxel generation : "<<time / 1e6<<"\n";
 
 }
 
@@ -126,7 +124,7 @@ void Chunk::PushCube(vec3 top_pos,std::function<BlockType(vec3)> voxel_sampler) 
 }
 
 void Chunk::GenerateMesh(std::function<BlockType(vec3)> voxel_sampler) {
-    auto a = std::chrono::high_resolution_clock::now();
+    //auto a = std::chrono::high_resolution_clock::now();
     mesh.Clear();
     translucent.Clear();
     for (float x=0; x<CHUNK_SIZE; x++) {
@@ -141,9 +139,9 @@ void Chunk::GenerateMesh(std::function<BlockType(vec3)> voxel_sampler) {
     mesh.UpdeteMesh();
     translucent.UpdeteMesh();
 
-    auto b = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration_cast<std::chrono::nanoseconds>(b-a).count();
-    std::cout<<"mesh generation :"<<time / 1e6<<"\n";
+    //auto b = std::chrono::high_resolution_clock::now();
+    //float time = std::chrono::duration_cast<std::chrono::nanoseconds>(b-a).count();
+    //std::cout<<"mesh generation :"<<time / 1e6<<"\n";
 }
 
 void Chunk::Draw() {

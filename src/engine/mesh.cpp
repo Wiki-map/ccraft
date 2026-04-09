@@ -2,8 +2,6 @@
 
 #include "glad/gl.h"
 #include <cstddef>
-#include <iostream>
-#include <stdlib.h>
 
 
 void Mesh::Init() {
@@ -16,10 +14,10 @@ void Mesh::Init() {
     glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*) offsetof(Vertex,pos));
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1,1,GL_UNSIGNED_INT,GL_FALSE,sizeof(Vertex),(void*) offsetof(Vertex,color));
+    glVertexAttribIPointer(1,1,GL_UNSIGNED_INT,sizeof(Vertex),(void*) offsetof(Vertex,color));
     glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(2,1,GL_UNSIGNED_BYTE,GL_FALSE,sizeof(Vertex),(void*)offsetof(Vertex,norm));
+    glVertexAttribIPointer(2,1,GL_UNSIGNED_BYTE,sizeof(Vertex),(void*) offsetof(Vertex,norm));
     glEnableVertexAttribArray(2);
 
     triangle_count = 0;
@@ -44,22 +42,9 @@ void Mesh::PushTriangle(
     Color color,
     NormalDir norm
 ) {
-
-    vertices.push_back({});
-    vertices.push_back({});
-    vertices.push_back({});
-
-    vertices[triangle_count*3].pos = p1;
-    vertices[triangle_count*3 + 1].pos = p2;
-    vertices[triangle_count*3 + 2].pos = p3;
-
-    vertices[triangle_count*3].color = rgba32(color);
-    vertices[triangle_count*3+1].color = rgba32(color);
-    vertices[triangle_count*3+2].color = rgba32(color);
-
-    vertices[triangle_count*3].norm = (uint8_t)norm;
-    vertices[triangle_count*3 + 1].norm = (uint8_t)norm;
-    vertices[triangle_count*3 + 2].norm = (uint8_t)norm;
+    vertices.push_back({p1,rgba32(color),(uint8_t)norm});
+    vertices.push_back({p2,rgba32(color),(uint8_t)norm});
+    vertices.push_back({p3,rgba32(color),(uint8_t)norm});
 
     triangle_count++;
 }
@@ -84,4 +69,5 @@ void Mesh::Draw() {
 void Mesh::Clean() {
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
+    std::vector<Vertex>().swap(vertices);
 }

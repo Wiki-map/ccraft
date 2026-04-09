@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <utility>
 #include <vector>
+#include <queue>
 
 ChunkManager::ChunkManager(int render_distance) {
     this->render_distance = render_distance;

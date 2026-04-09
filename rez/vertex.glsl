@@ -21,7 +21,7 @@ vec3 normals[6] = vec3[](
 );
 
 vec4 getcolor(uint id) {
-    vec4 rez = vec4((a_color & uint(0x000000FF)) >> 0, (a_color & uint(0x0000FF00)) >> 8, (a_color & uint(0x00FF0000)) >> 16, (a_color & uint(0xFF000000))>> 24);
+    vec4 rez = vec4((id & uint(255)), (id & uint(65535)) >> 8, (id & uint(16777215)) >> 16, (id & uint(4294967295))>> 24);
     rez.x /= 255.0f;
     rez.y /= 255.0f;
     rez.z /= 255.0f;

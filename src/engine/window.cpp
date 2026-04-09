@@ -148,7 +148,7 @@ void InitWindow(int32_t width,int32_t height,std::string title) {
     glfwSetCursorPosCallback(state.window,CursorPositionCallback);
     glfwSetMouseButtonCallback(state.window,MouseButtonCallback);
 
-    #ifdef ENGINE_DEBUG
+    #ifndef __APPLE__
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
         glDebugMessageCallback(MessageCallback,nullptr);
