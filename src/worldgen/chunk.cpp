@@ -73,7 +73,11 @@ Color GetBlockColor(BlockType type) {
     return rgba(0,0,0,0);
 }
 
-void Chunk::PushCube(vec3 top_pos,std::function<BlockType(vec3)> voxel_sampler) {
+
+// bad practice but i mean...
+#define VP(i,j,k) voxelsp[(i+1)*(CHUNK_SIZE+2)*(CHUNK_HEIGHT+2) + (j+1)*(CHUNK_SIZE+2) + k + 1]
+
+void Chunk::PushCube(vec3 top_pos,std::vector<BlockType> &voxelsp,int x,int y,int z) {
     vec3 top_top_right = top_pos; top_top_right.x += BLOCK_SIZE;
     vec3 top_bot_left = top_pos; top_bot_left.z += BLOCK_SIZE;
     vec3 top_bot_right = top_bot_left; top_bot_right.x += BLOCK_SIZE;
@@ -83,9 +87,9 @@ void Chunk::PushCube(vec3 top_pos,std::function<BlockType(vec3)> voxel_sampler) 
     vec3 bot_bot_left = bot_pos; bot_bot_left.z += BLOCK_SIZE;
     vec3 bot_bot_right = bot_bot_left; bot_bot_right.x += BLOCK_SIZE;
 
-    Color color = GetBlockColor(voxel_sampler(top_pos));
+    Color color = GetBlockColor(VP(x,y,z));
 
-    if (top_pos.y < WATTER_LEVEL*BLOCK_SIZE && voxel_sampler(top_pos + (vec3){0,BLOCK_SIZE,0}) == BlockType::AIR) {
+    if (top_pos.y < WATTER_LEVEL*BLOCK_SIZE && VP(x,y+1,z) == BlockType::AIR) {
         vec3 norm = {0,1,0};
         Color colorw = rgba(44, 110, 232,150);
         vec3 topw = top_pos; topw.y = WATTER_LEVEL*BLOCK_SIZE;
@@ -95,29 +99,29 @@ void Chunk::PushCube(vec3 top_pos,std::function<BlockType(vec3)> voxel_sampler) 
         translucent.PushQuad(topw,top_top_rightw,top_bot_leftw,top_bot_rightw,colorw,NormalDir::UP);
     }
 
-    if (voxel_sampler(top_pos + (vec3){0,BLOCK_SIZE,0}) == BlockType::AIR) {
+    if (VP(x,y+1,z) == BlockType::AIR) {
         mesh.PushQuad(top_pos,top_top_right,top_bot_left,top_bot_right,color,NormalDir::UP);
     }
 
-    if (voxel_sampler(top_pos + (vec3){0,-BLOCK_SIZE,0}) == BlockType::AIR) {
+    if (VP(x,y-1,z) == BlockType::AIR) {
         mesh.PushQuad(bot_bot_left,bot_bot_right,bot_pos,bot_top_right,color,NormalDir::DOWN);
     }
 
 
     //left face
-    if (voxel_sampler(top_pos + (vec3){-BLOCK_SIZE,0,0}) == BlockType::AIR) { 
+    if (VP(x-1,y,z) == BlockType::AIR) { 
         mesh.PushQuad(top_pos,top_bot_left,bot_pos,bot_bot_left,color,NormalDir::LEFT);
     }
 
-    if (voxel_sampler(top_pos + (vec3){BLOCK_SIZE,0,0}) == BlockType::AIR) {
+    if (VP(x+1,y,z) == BlockType::AIR) {
         mesh.PushQuad(top_bot_right,top_top_right,bot_bot_right,bot_top_right,color,NormalDir::RIGHT);
     }
 
     //front face
-    if (voxel_sampler(top_pos + (vec3){0,0,BLOCK_SIZE}) == BlockType::AIR) {
+    if (VP(x,y,z+1)  == BlockType::AIR) {
         mesh.PushQuad(top_bot_left,top_bot_right,bot_bot_left,bot_bot_right,color,NormalDir::FRONT);
     }
-    if (voxel_sampler(top_pos + (vec3){0,0,-BLOCK_SIZE}) == BlockType::AIR) {
+    if (VP(x,y,z-1)  == BlockType::AIR) {
         mesh.PushQuad(top_top_right,top_pos,bot_top_right,bot_pos,color,NormalDir::BACK);
     }
 
@@ -125,6 +129,22 @@ void Chunk::PushCube(vec3 top_pos,std::function<BlockType(vec3)> voxel_sampler) 
 
 void Chunk::GenerateMesh(std::function<BlockType(vec3)> voxel_sampler) {
     //auto a = std::chrono::high_resolution_clock::now();
+
+    std::vector<BlockType> voxelsp((CHUNK_SIZE+2)*(CHUNK_SIZE+2)*(CHUNK_HEIGHT+2) + 10);
+
+    // fill block data with padding
+    for (float x=-1; x<=CHUNK_SIZE; x++) {
+        for (float z=-1; z<=CHUNK_SIZE; z++) {
+            for (int y=0; y<CHUNK_HEIGHT; y++) {
+                vec3 pos = {position.x + x*BLOCK_SIZE,y*BLOCK_SIZE, position.y + z*BLOCK_SIZE};
+                if (x >= 0 && z >= 0 && x < CHUNK_SIZE && z < CHUNK_SIZE) {
+                    voxelsp[(x+1)*(CHUNK_SIZE+2)*(CHUNK_HEIGHT+2) + (y+1)*(CHUNK_SIZE+2) + z + 1] = voxels[x*CHUNK_SIZE*CHUNK_HEIGHT + y*CHUNK_SIZE + z];
+                }
+                else voxelsp[(x+1)*(CHUNK_SIZE+2)*(CHUNK_HEIGHT+2) + (y+1)*(CHUNK_SIZE+2) + z + 1] = voxel_sampler(pos);
+            }
+        }
+    }
+
     mesh.Clear();
     translucent.Clear();
     for (float x=0; x<CHUNK_SIZE; x++) {
@@ -132,12 +152,14 @@ void Chunk::GenerateMesh(std::function<BlockType(vec3)> voxel_sampler) {
             for (float z=0; z<CHUNK_SIZE; z++) {
                 if (voxels[x*CHUNK_SIZE*CHUNK_HEIGHT + y*CHUNK_SIZE + z] == BlockType::AIR) continue;
                 vec3 pos = {position.x + x*BLOCK_SIZE,y*BLOCK_SIZE, position.y + z*BLOCK_SIZE};
-                this->PushCube(pos,voxel_sampler);
+                this->PushCube(pos,voxelsp,x,y,z);
             }
         }
     }
     mesh.UpdeteMesh();
     translucent.UpdeteMesh();
+
+    std::vector<BlockType>().swap(voxelsp);
 
     //auto b = std::chrono::high_resolution_clock::now();
     //float time = std::chrono::duration_cast<std::chrono::nanoseconds>(b-a).count();
@@ -152,6 +174,7 @@ void Chunk::Draw() {
 void Chunk::Clean() {
     mesh.Clean();
     translucent.Clean();
+    std::vector<BlockType>().swap(voxels);
 }
 
 vec2 Chunk::GetPosition() {return position;}

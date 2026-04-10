@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <string>
-#include "utils.h"
+#include "cgm.h"
 
 void InitWindow(int32_t width,int32_t height,std::string title);
 bool IsWindowClosed();

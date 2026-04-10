@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include "engine/color.h"
-#include "utils.h"
+#include "cgm.h"
 
 enum class NormalDir {
     UP,

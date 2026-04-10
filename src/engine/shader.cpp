@@ -1,11 +1,9 @@
+#include "glad/gl.h"
 #include "engine/shader.h"
 
 #include <fstream>
 #include <iostream>
 #include <sstream>
-
-#include "glad/gl.h"
-#include <glm/gtc/type_ptr.hpp>
 
 static std::string GetFileContend(std::string path) {
     std::ifstream file(path);
@@ -70,51 +68,35 @@ Shader::Shader(std::string vertex_path,std::string fragment_path) {
     glDeleteShader(fragment_shader);
 }
 
-void Shader::SetVector2Uniform(std::string name,glm::vec2 val) {
+void Shader::SetVector2Uniform(std::string name,vec2 val) {
     glUseProgram(this->id);
 
     int32_t location = glGetUniformLocation(this->id,name.c_str());
-    glUniform2fv(location,1,&val[0]);
+    glUniform2fv(location,1,valueptr(&val));
 }
 
-void Shader::SetVector3Uniform(std::string name,glm::vec3 val) {
+void Shader::SetVector3Uniform(std::string name,vec3 val) {
     glUseProgram(this->id);
 
     int32_t location = glGetUniformLocation(this->id,name.c_str());
-    glUniform3fv(location,1,&val[0]);
+    glUniform3fv(location,1,valueptr(&val));
 }
 
-void Shader::SetVector4Uniform(std::string name,glm::vec4 val) {
+void Shader::SetVector4Uniform(std::string name,vec4 val) {
     glUseProgram(this->id);
 
     int32_t location = glGetUniformLocation(this->id,name.c_str());
-    glUniform4fv(location,1,&val[0]);
+    glUniform4fv(location,1,valueptr(&val));
 }
 
 
-void Shader::SetMatrix4Uniform(std::string name,glm::mat4 val) {
+void Shader::SetMatrix4Uniform(std::string name,mat4 val) {
     glUseProgram(this->id);
 
 
     int32_t location = glGetUniformLocation(this->id,name.c_str());
-    
-    /*
-    
-        wierd bug with glm, i think the matrix was inverted maybe..
-        idk
 
-        if i pass glm::value_ptr(val) i dosent work...
-
-    */
-
-    float rez[16];
-    for (int i=0; i<4; i++) {
-        for (int j=0; j<4; j++) {
-            rez[i*4+j] = val[j][i];
-        }
-    }
-
-    glUniformMatrix4fv(location,1,GL_FALSE,rez);
+    glUniformMatrix4fv(location,1,GL_FALSE,&val.v[0]);
 }
 
 void Shader::SetIntArrayUniform(std::string name,int32_t* val,size_t count) {

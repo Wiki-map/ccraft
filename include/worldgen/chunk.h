@@ -1,12 +1,12 @@
 #pragma once
 
 #include "engine/color.h"
-#include "utils.h"
+#include "cgm.h"
 #include "engine/mesh.h"
 #include <functional>
 
 #define CHUNK_SIZE 16
-#define CHUNK_HEIGHT 64
+#define CHUNK_HEIGHT 128
 #define BLOCK_SIZE (float)1.0f
 #define WATTER_LEVEL 25
 
@@ -39,7 +39,7 @@ struct Chunk {
 
 private:
 
-    void PushCube(vec3 top_pos,std::function<BlockType(vec3)> voxel_sampler);
+    void PushCube(vec3 top_pos,std::vector<BlockType> &voxelsp,int x,int y,int z);
 
     Mesh mesh;
     Mesh translucent;

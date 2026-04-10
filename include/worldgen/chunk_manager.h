@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils.h"
+#include "cgm.h"
 #include <vector>
 #include <functional>
 #include "worldgen/chunk.h"

@@ -1,7 +1,6 @@
 #include "player.h"
 #include "engine/window.h"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_transform.hpp"
+#include <cmath>
 
 Player::Player(vec3 pos) {
     position = pos;
@@ -39,12 +38,12 @@ void Player::Update(float dt) {
     if (pitch > 89) pitch = 89;
     if (pitch < -89) pitch = -89;
 
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.x = cos(radians(yaw)) * cos(radians(pitch));
+    direction.y = sin(radians(pitch));
+    direction.z = sin(radians(yaw)) * cos(radians(pitch));
 
-    direction2.x = cos(glm::radians(yaw));
-    direction2.z = sin(glm::radians(yaw));
+    direction2.x = cos(radians(yaw));
+    direction2.z = sin(radians(yaw));
     direction2.y = 0;
 
     float speed = 10;
@@ -67,11 +66,11 @@ void Player::Update(float dt) {
     }
 
     if (IsKeyDown(KeyboardKey::A)) {
-        vec3 right = vec3Normalize(vec3Cross(direction,up));
+        vec3 right = normalize(cross(direction,up));
         position -= right * speed;
     }
     if (IsKeyDown(KeyboardKey::D)) {
-        vec3 right = vec3Normalize(vec3Cross(direction,up));
+        vec3 right = normalize(cross(direction,up));
         position += right * speed;
     }
 
@@ -89,28 +88,9 @@ vec3 Player::GetDirection() {
     return direction;
 }
 vec3 Player::GetRight() {
-    return vec3Normalize(vec3Cross(direction,up));
+    return normalize(cross(direction,up));
 }
 
 vec3 Player::GetDirection2() {
     return direction2;
-}
-
-glm::mat4 Player::GetViewMatrix() {
-    Camera camera = GetCamera();
-    glm::vec3 glm_position = Vec3ToGLM(camera.position);
-    glm::vec3 glm_target = Vec3ToGLM(camera.target);
-
-    glm::mat4 view = glm::lookAt(glm_position,glm_target,glm::vec3(0,1,0));
-
-    return view;
-}
-
-glm::mat4 Player::GetPerspectivMatrix() {
-    Camera camera = GetCamera();
-    glm::vec3 glm_position = Vec3ToGLM(camera.position);
-    glm::vec3 glm_target = Vec3ToGLM(camera.target);
-
-    glm::mat4 proj = glm::perspective(glm::radians(camera.fov),GetWindowAspect(),camera.near,camera.far);
-    return proj;
 }

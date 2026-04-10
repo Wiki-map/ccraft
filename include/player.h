@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils.h"
+#include "cgm.h"
 #include "camera.h"
 
 class Player {
@@ -25,7 +25,4 @@ public:
     vec3 GetDirection();
     vec3 GetDirection2();
     vec3 GetRight();
-
-    glm::mat4 GetViewMatrix();
-    glm::mat4 GetPerspectivMatrix();
 };
